@@ -17,7 +17,7 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract TokenDistributor is Ownable {
     using SafeERC20 for IERC20;
 
-    /// @notice The immutable address of the AECToken contract.
+    /// @notice The immutable address of the AEC Token contract.
     IERC20 public immutable aecToken;
 
     // --- Allocation Constants (in Basis Points) ---
@@ -29,7 +29,7 @@ contract TokenDistributor is Ownable {
     uint256 public constant AIRDROP_ALLOCATION_BPS = 800;      // 8%
     uint256 public constant BUG_BOUNTY_ALLOCATION_BPS = 100;     // 1%
     uint256 public constant LOTTERY_ALLOCATION_BPS = 100;      // 1%
-    uint256 public constant DAO_TREASURY_ALLOCATION_BPS = 1900;  // 19%
+    uint256 public constant PERPETUAL_ENDOWMENT_ALLOCATION_BPS = 1900;  // 19%
     uint256 public constant FOUNDER_ALLOCATION_BPS = 100;      // 1%
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
 
@@ -42,7 +42,7 @@ contract TokenDistributor is Ownable {
     bool public hasDistributedToAirdrop;
     bool public hasDistributedToBugBounty;
     bool public hasDistributedToLottery;
-    bool public hasDistributedToDAO;
+    bool public hasDistributedToPerpetualEndowment;
     bool public hasDistributedToFounder;
 
     /// @notice Emitted when a portion of the total supply is distributed to a designated address.
@@ -50,7 +50,7 @@ contract TokenDistributor is Ownable {
 
     /**
      * @dev Sets the immutable AEC token address and verifies allocation percentages.
-     * @param _aecTokenAddress The address of the AECToken contract.
+     * @param _aecTokenAddress The address of the AEC Token contract.
      * @param _initialOwner The address that will have ownership of this contract to perform distributions.
      */
     constructor(address _aecTokenAddress, address _initialOwner) Ownable(_initialOwner) {
@@ -61,7 +61,7 @@ contract TokenDistributor is Ownable {
         uint256 totalBps = FAIR_LAUNCH_ALLOCATION_BPS + LIQUIDITY_ALLOCATION_BPS + 
                            LP_STAKING_REWARDS_BPS + TOKEN_STAKING_REWARDS_BPS + NFT_STAKING_REWARDS_BPS +
                            AIRDROP_ALLOCATION_BPS + BUG_BOUNTY_ALLOCATION_BPS + LOTTERY_ALLOCATION_BPS +
-                           DAO_TREASURY_ALLOCATION_BPS + FOUNDER_ALLOCATION_BPS;
+                           PERPETUAL_ENDOWMENT_ALLOCATION_BPS + FOUNDER_ALLOCATION_BPS;
         require(totalBps == BASIS_POINTS_DIVISOR, "TD: Allocations do not sum to 100%");
     }
 
@@ -148,13 +148,13 @@ contract TokenDistributor is Ownable {
     }
 
     /**
-     * @notice Distributes 19% of the total AEC supply to the DAO Treasury contract.
-     * @param daoTreasury The address of the DAO's treasury contract.
+     * @notice Distributes 19% of the total AEC supply to the AECPerpetualEndowment contract.
+     * @param perpetualEndowmentContract The address of the deployed AECPerpetualEndowment contract.
      */
-    function distributeToDAO(address daoTreasury) external onlyOwner {
-        require(!hasDistributedToDAO, "TD: DAO tokens already distributed");
-        hasDistributedToDAO = true;
-        _distribute("DAO Treasury", daoTreasury, DAO_TREASURY_ALLOCATION_BPS);
+    function distributeToPerpetualEndowment(address perpetualEndowmentContract) external onlyOwner {
+        require(!hasDistributedToPerpetualEndowment, "TD: Perpetual Endowment tokens already distributed");
+        hasDistributedToPerpetualEndowment = true;
+        _distribute("Perpetual Endowment", perpetualEndowmentContract, PERPETUAL_ENDOWMENT_ALLOCATION_BPS);
     }
 
     /**
