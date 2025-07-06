@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+package-lock.json
+
+# Environment
+.env
+
+# Build
+artifacts/
+cache/
+coverage/
+typechain/
+typechain-types/
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# OpenZeppelin
+.openzeppelin/
+
+# Backup
+backup_*/
