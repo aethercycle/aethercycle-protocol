@@ -22,8 +22,5 @@ AetherCycle is an autonomous DeFi protocol powered by the **Endowment Engine**, 
 ## 👤 Author
 
 **Fukuhi**  
-## 👤 Author
-
-**Fukuhi**  
 Twitter: [@aethercycle](https://twitter.com/aethercycle)  
 Website: [aethercycle.xyz](https://aethercycle.xyz)
