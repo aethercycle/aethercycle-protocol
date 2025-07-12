@@ -25,4 +25,9 @@ contract MockContract {
     function transfer(address to, uint256 amount) external pure returns (bool) {
         return true;
     }
+
+    /**
+     * @notice Receive function to accept ETH
+     */
+    receive() external payable {}
 } 
