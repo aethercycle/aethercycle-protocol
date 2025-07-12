@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 import "@openzeppelin/contracts/utils/ReentrancyGuard.sol";
 import "@openzeppelin/contracts/token/ERC20/utils/SafeERC20.sol";
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "../interfaces/IAECToken.sol";
 
 /**
  * @title AECToken
@@ -32,46 +33,14 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
  * ✅ Added proper edge case handling
  * ✅ Enhanced precision for tax calculations
  */
-contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
+contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
     using SafeERC20 for IERC20;
 
-    // --- Events ---
-    /// @notice Emitted when tax is collected on a transfer involving an AMM or contract.
-    /// @param from The sender address.
-    /// @param to The recipient address.
-    /// @param taxAmount The amount of AEC taken as tax.
-    /// @param isBuy True if this was a buy (from AMM/contract), false if sell.
-    /// @param taxRateBps The tax rate (in basis points) applied.
-    event TaxCollected(address indexed from, address indexed to, uint256 taxAmount, bool isBuy, uint16 taxRateBps);
+    // ================================================================
+    // EVENTS
+    // ================================================================
     
-    /// @notice Emitted when the PerpetualEngine is approved to process collected taxes.
-    /// @param engineAddress The address of the PerpetualEngine contract.
-    /// @param amountApproved The amount of AEC approved for processing.
-    event PerpetualEngineApproved(address indexed engineAddress, uint256 amountApproved);
-    
-    /// @notice Emitted when the PerpetualEngine address is set.
-    /// @param newEngineAddress The new PerpetualEngine address.
-    event PerpetualEngineAddressSet(address indexed newEngineAddress);
-    
-    /// @notice Emitted when the primary AMM pair is set.
-    /// @param pairAddress The address of the primary AMM pair.
-    event PrimaryPairSet(address indexed pairAddress);
-    
-    /// @notice Emitted when an account's tax exclusion status is set.
-    /// @param account The account address.
-    /// @param isExcluded Whether the account is excluded from tax.
-    event TaxExclusionSet(address indexed account, bool isExcluded);
-    
-    /// @notice Emitted when an AMM pair is marked as official or not.
-    /// @param pair The AMM pair address.
-    /// @param isPair Whether the address is now an official AMM pair.
-    event AmmPairSet(address indexed pair, bool isPair);
-    
-    /// @notice Emitted when foreign tokens are rescued from the contract.
-    /// @param tokenAddress The rescued token address.
-    /// @param to The recipient of the rescued tokens.
-    /// @param amount The amount rescued.
-    event ForeignTokenRescued(address indexed tokenAddress, address indexed to, uint256 amount);
+    // Events are defined in IAECToken interface
 
     // --- Constants ---
     /// @notice The initial buy tax rate (basis points, 1% = 100) for the first 24 hours after launch.
@@ -465,7 +434,7 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      * @dev Standard ERC20 decimals implementation - returns 18.
      * @return uint8 The number of decimal places (18).
      */
-    function decimals() public pure override returns (uint8) {
+    function decimals() public pure override(ERC20, IAECToken) returns (uint8) {
         return 18;
     }
 
@@ -475,5 +444,33 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard {
      */
     receive() external payable {
         revert("AEC: This contract does not accept Ether");
+    }
+
+    function totalSupply() public view override(ERC20, IAECToken) returns (uint256) {
+        return super.totalSupply();
+    }
+
+    function balanceOf(address account) public view override(ERC20, IAECToken) returns (uint256) {
+        return super.balanceOf(account);
+    }
+
+    function transfer(address to, uint256 amount) public override(ERC20, IAECToken) returns (bool) {
+        return super.transfer(to, amount);
+    }
+
+    function allowance(address owner, address spender) public view override(ERC20, IAECToken) returns (uint256) {
+        return super.allowance(owner, spender);
+    }
+
+    function approve(address spender, uint256 amount) public override(ERC20, IAECToken) returns (bool) {
+        return super.approve(spender, amount);
+    }
+
+    function transferFrom(address from, address to, uint256 amount) public override(ERC20, IAECToken) returns (bool) {
+        return super.transferFrom(from, to, amount);
+    }
+
+    function burn(uint256 amount) public override(ERC20Burnable, IAECToken) {
+        super.burn(amount);
     }
 }
