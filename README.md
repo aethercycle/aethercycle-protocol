@@ -50,6 +50,35 @@ There are two tests in `test/unit/AECStakingNFT.test.js` that are intentionally 
 
 This is a standard practice in DeFi projects to ensure transparency and maintain comprehensive coverage elsewhere. All other tests are passing and the protocol logic is fully covered for realistic scenarios.
 
+## 🔗 Integration Test Coverage
+
+In addition to comprehensive unit tests, the protocol includes integration tests that validate the interaction between multiple core contracts in realistic scenarios.
+
+**Currently covered by integration tests:**
+- AECToken
+- PerpetualEngine
+- PerpetualEndowment
+- AECStakingLP
+- AECStakingNFT
+- AECStakingToken
+
+**Integration scenarios tested:**
+- Staking and claiming rewards in all pools (LP, Token, NFT)
+- Engine staking and reward distribution
+- Endowment initialization and scheduled releases
+- Reward decay over time and protocol sustainability
+- Analytics and pool statistics
+- Permissioning (only engine can call certain functions)
+- Multi-user and multi-tier reward logic
+
+**How to run integration tests:**
+```bash
+npx hardhat test test/integration/FullProtocol.test.js
+```
+
+**Note:**
+Only 6 of 15+ contracts are currently covered by integration tests; the rest are planned for future coverage. See the [whitepaper](Aethercycle-Whitepaper/AEC%20Whitepaper%20v2.0%20-%20Complete%20Document.pdf) for the full protocol architecture.
+
 ## 🚀 Getting Started
 
 1. Install dependencies:

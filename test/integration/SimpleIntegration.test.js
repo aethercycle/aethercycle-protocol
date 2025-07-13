@@ -36,40 +36,50 @@ describe("Simple Integration Test", function () {
         const AECToken = await ethers.getContractFactory("AECToken");
         aecToken = await AECToken.deploy(owner.address, tokenDistributor.target);
 
-        // Deploy PerpetualEngine first (needed by other contracts)
+        // Deploy temporary contracts for PerpetualEngine constructor
+        const MockContract = await ethers.getContractFactory("MockContract");
+        const tempStakingLP = await MockContract.deploy();
+        const tempEndowment = await MockContract.deploy();
+
+        // Deploy PerpetualEngine with temporary addresses
         const PerpetualEngine = await ethers.getContractFactory("PerpetualEngine");
         perpetualEngine = await PerpetualEngine.deploy(
             aecToken.target,                 // _aecTokenAddress
             mockStablecoin.target,           // _stablecoinTokenAddress
             mockRouter.target,               // _routerAddress
-            mockPair.target,                 // _stakingContractAddressLP (temporary)
-            mockPair.target,                 // _perpetualEndowmentAddress (temporary)
+            tempStakingLP.target,            // _stakingContractAddressLP (temporary)
+            tempEndowment.target,            // _perpetualEndowmentAddress (temporary)
             owner.address,                   // _initialDeployerWallet
             100,                             // _slippageBps (1%)
             ethers.parseEther("1000"),       // _minReqTotalAecToProcess
             3600                             // _cooldownSeconds (1 hour)
         );
 
-        // Deploy AECStakingLP
+        // Deploy AECStakingLP with the correct engine address
         const AECStakingLP = await ethers.getContractFactory("AECStakingLP");
         stakingLP = await AECStakingLP.deploy(
             aecToken.target,                 // _aecToken
             mockPair.target,                 // _lpToken (AEC/USDC pair)
-            perpetualEngine.target,          // _perpetualEngine
+            perpetualEngine.target,          // _perpetualEngine (correct address)
             ethers.parseEther("177777777")   // _initialAllocation
         );
 
-        // Deploy PerpetualEndowment
+        // Deploy PerpetualEndowment with the correct engine address
         const PerpetualEndowment = await ethers.getContractFactory("PerpetualEndowment");
         perpetualEndowment = await PerpetualEndowment.deploy(
             aecToken.target,
-            perpetualEngine.target,          // _perpetualEngine
-            owner.address,                   // _emergencyMultisig
-            ethers.parseEther("311111111")   // _initialAmount
+            perpetualEngine.target,          // _perpetualEngine (correct address)
+            ethers.parseEther("311111111")
         );
 
         // Setup permissions
         await aecToken.setPerpetualEngineAddress(perpetualEngine.target);
+
+        // Fund ETH to perpetualEngine for gas
+        // await owner.sendTransaction({
+        //     to: perpetualEngine.target,
+        //     value: ethers.parseEther("1")
+        // });
     });
 
     it("Should deploy all contracts successfully", async function () {
