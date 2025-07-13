@@ -12,15 +12,15 @@ describe("Full Protocol Integration", function () {
     
     beforeEach(async function () {
         [owner, user1, user2, user3] = await ethers.getSigners();
-
+        
         // Deploy mock contracts first
         const MockERC20 = await ethers.getContractFactory("MockERC20");
         mockStablecoin = await MockERC20.deploy("Mock USDC", "USDC");
         mockLPToken = await MockERC20.deploy("Mock LP Token", "LP");
-        
+
         const MockRouter = await ethers.getContractFactory("MockContract");
         mockRouter = await MockRouter.deploy();
-        
+
         // Deploy AEC Token
         const AECToken = await ethers.getContractFactory("AECToken");
         aecToken = await AECToken.deploy(owner.address, owner.address); // Use owner as both initial owner and token distributor
