@@ -8,7 +8,7 @@ import "../interfaces/IPerpetualEngine.sol";
 
 /**
  * @title PerpetualEndowment
- * @author AetherCycle Team
+ * @author Fukuhi
  * @notice Mathematical guarantee of infinite protocol operation
  * @dev Implements adaptive release mechanism with compound calculations
  */

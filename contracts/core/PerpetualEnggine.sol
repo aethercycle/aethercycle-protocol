@@ -14,7 +14,7 @@ import "../interfaces/IStakingRewards.sol";
 
 /**
  * @title PerpetualEngine
- * @author AetherCycle Team  
+ * @author Fukuhi
  * @notice Autonomous economic engine for AetherCycle ecosystem
  * @dev Processes taxes, burns tokens, adds liquidity, distributes rewards
  * Features flexible liquidity strategies and anti-dead loop mechanisms
@@ -328,10 +328,11 @@ contract PerpetualEngine is ReentrancyGuard, IPerpetualEngine {
             IERC20(address(aecToken)).safeTransferFrom(address(aecToken), address(this), approvedTax);
         }
 
-        // Claim LP staking rewards if possible
+        // Claim LP staking rewards for engine compounding
         if (_isValidContract(stakingContractLP)) {
-            try IAECStakingLP(stakingContractLP).notifyRewardAmount(0) {
-                // This may trigger reward claims in some implementations
+            try IAECStakingLP(stakingContractLP).claimReward() {
+                // Engine claims accumulated rewards (base + bonus) for compounding
+                emit EngineRewardsClaimed(aecToken.balanceOf(address(this)) - balanceBefore);
             } catch {
                 // Continue if claiming fails
             }

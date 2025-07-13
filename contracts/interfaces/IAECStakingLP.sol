@@ -200,7 +200,7 @@ interface IAECStakingLP {
     event RewardPaid(address indexed user, uint256 reward);
     event EngineStaked(uint256 amount, uint256 timestamp);
     event EngineRewardReturned(uint256 amount);
-    event BaseRewardDecay(uint256 releasedAmount, uint256 remainingAmount);
+    event BaseRewardsDecayed(uint256 decayAmount, uint256 remaining, uint256 newRate);
     event BonusRewardAdded(uint256 reward);
     event RewardsDurationUpdated(uint256 newDuration);
     event EmergencyPause(bool status);

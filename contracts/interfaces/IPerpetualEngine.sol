@@ -2,6 +2,17 @@
 pragma solidity ^0.8.20;
 
 interface IPerpetualEngine {
+    // ================================================================
+    // EVENTS
+    // ================================================================
+    
+    /// @notice Emitted when engine claims accumulated rewards for compounding
+    event EngineRewardsClaimed(uint256 amount);
+    
+    // ================================================================
+    // FUNCTIONS
+    // ================================================================
+    
     function runCycle() external;
     function setStakingContracts(address _stakingContractToken, address _stakingContractNFT) external;
     function renounceDeployerPrivileges() external;

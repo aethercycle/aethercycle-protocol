@@ -9,7 +9,7 @@ import "../interfaces/IAECStakingLP.sol";
 
 /**
  * @title AECStakingLP
- * @author AetherCycle Team
+ * @author fukuhi
  * @notice Perpetual LP staking with mathematical sustainability and tier system
  * @dev Implements dual reward system with special engine tier for fairness
  * 
@@ -92,10 +92,10 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     /// @notice Total regular LP tokens staked (unweighted)
     uint256 public totalSupply;
     
-    /// @notice Remaining base rewards from initial allocation
+    /// @notice Remaining base rewards for distribution
     uint256 public remainingBaseRewards;
     
-    /// @notice Last time base rewards were calculated
+    /// @notice Timestamp of last base reward update
     uint256 public lastBaseRewardUpdate;
     
     /// @notice Current reward per token stored
@@ -131,11 +131,14 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     /// @notice Emergency pause state
     bool public paused;
     
-    /// @notice Total rewards distributed from base allocation
-    uint256 public totalBaseRewardsDistributed;
-    
     /// @notice Total rewards distributed from engine bonus
     uint256 public totalBonusRewardsDistributed;
+    
+    /// @notice Current base reward rate per second
+    uint256 public baseRewardRate;
+    
+    /// @notice Timestamp when current base reward period finishes
+    uint256 public basePeriodFinish;
 
     // ================================================================
     // MODIFIERS
@@ -154,8 +157,9 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
      * @param account Account to update rewards for
      */
     modifier updateReward(address account) {
+        // Accumulate rewards up to now
         rewardPerTokenStored = rewardPerToken();
-        lastUpdateTime = lastTimeRewardApplicable();
+        lastUpdateTime = block.timestamp;
         
         if (account != address(0)) {
             rewards[account] = earned(account);
@@ -202,8 +206,10 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
         deploymentTime = block.timestamp;
         
         // Initialize base rewards
-        remainingBaseRewards = _initialAllocation;
+        remainingBaseRewards = initialRewardAllocation;
         lastBaseRewardUpdate = block.timestamp;
+        baseRewardRate = (initialRewardAllocation * DECAY_RATE_BPS) / (BASIS_POINTS * DECAY_PERIOD);
+        basePeriodFinish = block.timestamp + DECAY_PERIOD;
         
         // Configure tier system
         _configureTiers();
@@ -504,30 +510,27 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
      * @notice Updates base rewards with mathematical decay
      * @dev Implements 0.5% monthly decay matching perpetual endowment
      * This ensures mathematical sustainability over infinite time
+     * @dev Updates baseRewardRate for per-second distribution
      */
     function _updateBaseRewards() private {
         if (block.timestamp <= lastBaseRewardUpdate) return;
         
-        // Calculate how many 30-day periods have passed
-        uint256 periodsElapsed = (block.timestamp - lastBaseRewardUpdate) / DECAY_PERIOD;
-        if (periodsElapsed == 0) return;
-        
-        uint256 totalDecayRelease = 0;
-        uint256 remaining = remainingBaseRewards;
-        
-        // Calculate compound decay for multiple periods
-        for (uint256 i = 0; i < periodsElapsed; i++) {
-            uint256 periodRelease = (remaining * DECAY_RATE_BPS) / BASIS_POINTS;
-            totalDecayRelease += periodRelease;
-            remaining -= periodRelease;
-        }
-        
-        if (totalDecayRelease > 0) {
-            remainingBaseRewards = remaining;
-            lastBaseRewardUpdate += periodsElapsed * DECAY_PERIOD;
-            totalBaseRewardsDistributed += totalDecayRelease;
+        // Check if current period has finished
+        if (block.timestamp >= basePeriodFinish) {
+            // Calculate decay for this period
+            uint256 decayAmount = (remainingBaseRewards * DECAY_RATE_BPS) / BASIS_POINTS;
             
-            emit BaseRewardDecay(totalDecayRelease, remaining);
+            // Update remaining base rewards
+            remainingBaseRewards -= decayAmount;
+            
+            // Set new base reward rate for next period
+            baseRewardRate = (remainingBaseRewards * DECAY_RATE_BPS) / (BASIS_POINTS * DECAY_PERIOD);
+            
+            // Update timestamps
+            lastBaseRewardUpdate = block.timestamp;
+            basePeriodFinish = block.timestamp + DECAY_PERIOD;
+            
+            emit BaseRewardsDecayed(decayAmount, remainingBaseRewards, baseRewardRate);
         }
     }
 
@@ -547,35 +550,32 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
      * @notice Calculates current reward per token
      * @return Combined reward per token from base and bonus sources
      * @dev Precision scaled by 1e18 for accuracy
+     * @dev Uses per-second distribution for smooth reward flow
      */
     function rewardPerToken() public view returns (uint256) {
         if (totalWeightedSupply == 0) {
             return rewardPerTokenStored;
         }
         
-        // Calculate base reward contribution
-        uint256 baseRewardContribution = _calculateBaseRewardRate();
-        
-        // Combined rate = base + bonus
-        uint256 combinedRate = baseRewardContribution + bonusRewardRate;
-        
-        return rewardPerTokenStored + 
-               ((lastTimeRewardApplicable() - lastUpdateTime) * combinedRate * PRECISION) / 
-               totalWeightedSupply;
-    }
-    
-    /**
-     * @notice Calculates current base reward rate from decay
-     * @return Base reward rate per second
-     */
-    function _calculateBaseRewardRate() private view returns (uint256) {
-        uint256 timeSinceUpdate = block.timestamp - lastBaseRewardUpdate;
-        if (timeSinceUpdate >= DECAY_PERIOD) {
-            // Current period's release
-            uint256 currentRelease = (remainingBaseRewards * DECAY_RATE_BPS) / BASIS_POINTS;
-            return currentRelease / DECAY_PERIOD; // Per second rate
+        // Base rewards: accrue up to block.timestamp, but limit to DECAY_PERIOD to prevent overflow
+        uint256 baseRewardContribution = 0;
+        if (baseRewardRate > 0 && lastUpdateTime > 0) {
+            uint256 timeElapsed = block.timestamp - lastUpdateTime;
+            // Limit to DECAY_PERIOD to prevent overflow and ensure sustainable distribution
+            if (timeElapsed > DECAY_PERIOD) {
+                timeElapsed = DECAY_PERIOD;
+            }
+            baseRewardContribution = (timeElapsed * baseRewardRate * PRECISION) / totalWeightedSupply;
         }
-        return 0;
+        
+        // Bonus rewards: accrue up to lastTimeRewardApplicable
+        uint256 bonusRewardContribution = 0;
+        if (bonusRewardRate > 0 && lastUpdateTime > 0) {
+            uint256 timeElapsed = lastTimeRewardApplicable() - lastUpdateTime;
+            bonusRewardContribution = (timeElapsed * bonusRewardRate * PRECISION) / totalWeightedSupply;
+        }
+        
+        return rewardPerTokenStored + baseRewardContribution + bonusRewardContribution;
     }
     
     /**
@@ -723,14 +723,14 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
         totalDeposited = poolStats.totalDeposited;
         totalWithdrawn = poolStats.totalWithdrawn;
         totalRewardsPaid = poolStats.totalRewardsPaid;
-        baseRewardsDistributed = totalBaseRewardsDistributed;
+        baseRewardsDistributed = totalBaseRewardsDistributed();
         bonusRewardsDistributed = totalBonusRewardsDistributed;
         uniqueStakers = poolStats.uniqueStakers;
        
        // Calculate average APY if pool has history
        if (totalSupply > 0 && block.timestamp > deploymentTime) {
            uint256 timeElapsed = block.timestamp - deploymentTime;
-           uint256 totalRewards = totalBaseRewardsDistributed + totalBonusRewardsDistributed;
+           uint256 totalRewards = totalBaseRewardsDistributed() + totalBonusRewardsDistributed;
            uint256 annualizedRewards = (totalRewards * 365 days) / timeElapsed;
            averageAPY = (annualizedRewards * BASIS_POINTS) / totalSupply;
        }
@@ -954,5 +954,14 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
        
        requiredBalance = bonusRequired + baseRequired;
        hasBalance = currentBalance >= requiredBalance;
+   }
+
+   /**
+    * @notice Calculates total base rewards distributed to date
+    * @return Total base rewards distributed since deployment
+    * @dev Calculated as difference between initial and remaining
+    */
+   function totalBaseRewardsDistributed() public view returns (uint256) {
+       return initialRewardAllocation - remainingBaseRewards;
    }
 }
