@@ -9,6 +9,7 @@ AetherCycle represents a paradigm shift in DeFi sustainability, combining:
 - **Anti-Speculation Design**: Long-term value creation over short-term gains
 - **Community-Owned**: Decentralized governance and autonomous operation
 - **Perpetual Engine**: Self-sustaining economic model with continuous value generation
+- **Fully Autonomous**: Once launched, the protocol operates independently without human intervention or modifications
 
 ## 📜 Whitepaper
 - `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`
@@ -326,14 +327,6 @@ npx hardhat verify --network base CONTRACT_ADDRESS [constructor_args]
 - **Gas Usage Tracking**: Real-time gas consumption monitoring
 - **Cost Optimization**: Continuous improvement recommendations
 
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Add tests for new functionality
-4. Ensure all tests pass
-5. Submit a pull request
-
 ## 📄 License
 
 MIT License - see LICENSE file for details
@@ -343,6 +336,12 @@ MIT License - see LICENSE file for details
 - **GitHub**: https://github.com/aethercycle/aethercycle-protocol
 - **Documentation**: See `docs/` folder
 - **Whitepaper**: `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`
+
+## 👤 Author
+
+**Fukuhi**
+- **Twitter**: [@aethercycle](https://twitter.com/aethercycle)
+- **Website**: [aethercycle.xyz](https://aethercycle.xyz)
 
 ---
 
