@@ -11,6 +11,25 @@ AetherCycle represents a paradigm shift in DeFi sustainability, combining:
 - **Perpetual Engine**: Self-sustaining economic model with continuous value generation
 - **Fully Autonomous**: Once launched, the protocol operates independently without any human intervention or modifications
 
+## 🚀 Autonomous Finance (AutonoFi)
+
+AetherCycle introduces **Autonomous Finance (AutonoFi)** - a new approach to DeFi that replaces human promises with mathematical certainty.
+
+### The Paradigm Shift
+Instead of asking "Will the team deliver?" or "Will founders honor commitments?", AutonoFi provides calculable outcomes through immutable mathematical models.
+
+**Traditional DeFi** → **AutonoFi**
+- Trust in human promises → Mathematical guarantees
+- Growth-dependent sustainability → Mathematically proven infinite operation
+- Governance-controlled parameters → Immutable mathematical rules
+- Speculation-based returns → Calculation-based certainty
+
+### Core Innovation
+- **99% community ownership** (vs industry standard 70-80%)
+- **Mathematical proof of infinite operation** through Perpetual Endowment
+- **Immutable parameters** that cannot be changed by anyone
+- **Self-sustaining economic cycles** with compound growth effects
+
 ## 📜 Whitepaper
 - `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`
 - `Aethercycle-Whitepaper/Proof.md` (includes commit hash & author)
@@ -25,11 +44,14 @@ The protocol consists of **15+ smart contracts** organized across four functiona
 - **PerpetualEndowment**: Decentralized endowment fund with mathematical sustainability
 
 ### Distribution Layer
-- **AECStakingNFT**: Permissionless NFT staking with dual reward system
-- **AECStakingToken**: Tiered token staking with mathematical decay
-- **AECStakingLP**: LP token staking with engine integration
+- **TokenDistributor**: Initial supply distribution manager
+- **FairLaunch**: Trustless community sale mechanism
+- **LiquidityDeployer**: Automated initial liquidity creation
 
 ### Utility Layer
+- **AECStakingLP**: Liquidity provider rewards
+- **AECStakingToken**: Token holder rewards
+- **AECStakingNFT**: NFT collector rewards
 - **Revenue Distribution**: Automated fee collection and distribution
 - **Analytics Engine**: Real-time protocol statistics and projections
 - **AccountabilityDAO**: Limited governance for founder vesting extension and burn only
@@ -106,6 +128,12 @@ LP token staking with:
 
 ## 💰 Economic Model
 
+### Revenue Distribution
+The PerpetualEngine processes all protocol revenue through immutable mathematical distribution:
+- **20% Burn**: Permanent supply reduction for long-term value
+- **40% Liquidity**: Automated POL growth for market stability
+- **40% Rewards**: Distributed to stakers across all pools
+
 ### Reward Distribution
 - **Base Rewards**: Calculated per staked unit with automatic decay
 - **Bonus Rewards**: Distributed by the perpetual engine based on protocol performance
@@ -119,9 +147,10 @@ LP token staking with:
 - **Transparency**: All tax rates and distributions are publicly verifiable
 
 ### Endowment Management
-- **Mathematical Reserves**: Built-in sustainability mechanisms
-- **Scheduled Releases**: Automated fund distributions
+- **Mathematical Reserves**: 311,111,111 AEC (35% of supply) with 0.5% monthly decay
+- **Scheduled Releases**: Automated fund distributions for infinite operation
 - **Performance Analytics**: Real-time monitoring and projections
+- **Mathematical Proof**: Formally proven infinite operation regardless of market conditions
 
 ## 🔒 Security Features
 
@@ -283,7 +312,6 @@ aethercycle-protocol/
 - ✅ **Integration Tests**: 7 core contracts with realistic scenarios
 - ✅ **Gas Analysis**: Comprehensive gas usage and cost analysis
 - 🔄 **Additional Contracts**: 9+ contracts planned for future development
-- 🔄 **Governance**: Community governance framework in development
 - 🔄 **Analytics**: Advanced analytics and dashboard development
 
 ## ⛽ Gas Analysis & Optimization
