@@ -145,7 +145,7 @@ contract AECStakingToken is ReentrancyGuard {
     uint256 public totalRewardsPaid;
     uint256 public totalDeposited;
     uint256 public totalWithdrawn;
-
+    
     // ================================================================
     // EVENTS
     // ================================================================

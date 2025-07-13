@@ -359,4 +359,8 @@ contract AECStakingNFT is ReentrancyGuard {
         earnedRewards = earned(user);
         rewardPerNFTCurrent = rewardPerNFT();
     }
+
+    function calculateBaseRewardRatePublic() public view returns (uint256) {
+        return _calculateBaseRewardRate();
+    }
 }
