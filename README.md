@@ -37,6 +37,8 @@ AetherCycle is an autonomous DeFi protocol powered by the **Endowment Engine**, 
 - **AECStakingLP**: 24 tests covering LP staking, tier system, engine integration, reward distribution, and edge cases.
 - **AECToken**: 36 tests covering tax system, PerpetualEngine integration, configuration, security, and edge cases.
 - **PerpetualEndowment**: 18 tests covering initialization, fund releases, configuration, analytics, and mathematical sustainability.
+- **PerpetualEngine**: 39 tests covering cycle processing, reward distribution, endowment integration, deployer privileges, configuration, and economic model validation.
+- **Total**: 191 comprehensive unit tests across all core and staking contracts.
 - To run the tests:
   ```
   npx hardhat test
@@ -59,7 +61,8 @@ AetherCycle is an autonomous DeFi protocol powered by the **Endowment Engine**, 
 
 ## 🚧 Status
 
-- Core contracts and NFT staking logic are fully unit tested and passing.
+- All core contracts and staking contracts are fully unit tested and passing.
+- Comprehensive test coverage ensures mathematical rigor and security.
 
 ## 👤 Author
 
