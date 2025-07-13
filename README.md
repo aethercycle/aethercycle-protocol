@@ -15,9 +15,39 @@ AetherCycle is an autonomous DeFi protocol powered by the **Endowment Engine**, 
 - `docs/` — Optional documentation section
 - `LICENSE` — CC BY 4.0 License (you must credit Fukuhi if reused)
 
+## 🧩 NFT Staking
+
+- **AECStakingNFT**: Permissionless NFT staking contract. Anyone can stake NFTs to earn base rewards (with automatic decay) and bonus rewards from the perpetual engine.
+- Rewards are distributed fairly per NFT. Stakers can claim rewards or unstake at any time—no lockups, no penalties.
+- The decay mechanism ensures sustainable, non-inflationary rewards.
+
+## 🧪 Testing
+
+- All core and staking contracts are covered by comprehensive unit tests.
+- To run the tests:
+  ```
+  npx hardhat test
+  ```
+- Tests cover: staking, unstaking, reward calculation, decay, bonus rewards, edge cases, and realistic mass staking scenarios.
+
+## 🚀 Getting Started
+
+1. Install dependencies:
+   ```
+   npm install
+   ```
+2. Compile contracts:
+   ```
+   npx hardhat compile
+   ```
+3. Run tests:
+   ```
+   npx hardhat test
+   ```
+
 ## 🚧 Status
-> ⚠️ Contracts are under active development.  
-> Endowment Engine whitepaper is finalized and timestamped via Git commit.
+
+- Core contracts and NFT staking logic are fully unit tested and passing.
 
 ## 👤 Author
 
