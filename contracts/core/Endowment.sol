@@ -25,7 +25,6 @@ contract PerpetualEndowment is ReentrancyGuard {
     
     event EndowmentInitialized(uint256 amount, uint256 timestamp);
     event FundsReleased(uint256 amount, uint256 periodsProcessed, uint256 remainingBalance);
-    event EmergencyReleaseTriggered(address indexed caller, uint256 amount);
     event ReleaseIntervalUpdated(uint256 oldInterval, uint256 newInterval);
     event CompoundingEnabled(bool status);
 
@@ -57,7 +56,6 @@ contract PerpetualEndowment is ReentrancyGuard {
     
     IERC20 public immutable aecToken;
     address public immutable perpetualEngine;
-    address public immutable emergencyMultisig;
     uint256 public immutable deploymentTime;
     uint256 public immutable initialEndowmentAmount;
 
@@ -91,13 +89,6 @@ contract PerpetualEndowment is ReentrancyGuard {
         _;
     }
     
-    modifier onlyEmergency() {
-        require(msg.sender == emergencyMultisig, "ENDOW: Not emergency");
-        require(block.timestamp > releaseInfo.lastReleaseTime + EMERGENCY_DELAY, 
-                "ENDOW: Emergency delay not met");
-        _;
-    }
-    
     modifier whenSealed() {
         require(isSealed, "ENDOW: Not sealed");
         _;
@@ -110,17 +101,14 @@ contract PerpetualEndowment is ReentrancyGuard {
     constructor(
         address _aecToken,
         address _perpetualEngine,
-        address _emergencyMultisig,
         uint256 _initialAmount
     ) {
         require(_aecToken != address(0), "ENDOW: Invalid token");
         require(_perpetualEngine != address(0), "ENDOW: Invalid engine");
-        require(_emergencyMultisig != address(0), "ENDOW: Invalid multisig");
         require(_initialAmount == 311_111_111 * 1e18, "ENDOW: Must be exactly 311,111,111 AEC");
         
         aecToken = IERC20(_aecToken);
         perpetualEngine = _perpetualEngine;
-        emergencyMultisig = _emergencyMultisig;
         initialEndowmentAmount = _initialAmount;
         deploymentTime = block.timestamp;
     }
@@ -265,29 +253,6 @@ contract PerpetualEndowment is ReentrancyGuard {
             gasEfficiencyScore = (potentialAmount * 100) / (tx.gasprice * 200000);
             if (gasEfficiencyScore > 100) gasEfficiencyScore = 100;
         }
-    }
-
-    // ================================================================
-    // EMERGENCY FUNCTIONS
-    // ================================================================
-    
-    /**
-     * @notice Emergency release if engine is non-operational for extended period
-     * @dev Requires 180 days of inactivity
-     */
-    function emergencyRelease() external onlyEmergency nonReentrant {
-        uint256 releaseAmount = (aecToken.balanceOf(address(this)) * RELEASE_RATE_BPS) / BASIS_POINTS;
-        require(releaseAmount > 0, "ENDOW: Nothing to release");
-        
-        // Update state
-        releaseInfo.lastReleaseTime = block.timestamp;
-        releaseInfo.totalReleased += releaseAmount;
-        releaseInfo.lastReleaseAmount = releaseAmount;
-        
-        // Transfer to multisig for manual distribution
-        aecToken.safeTransfer(emergencyMultisig, releaseAmount);
-        
-        emit EmergencyReleaseTriggered(msg.sender, releaseAmount);
     }
 
     // ================================================================
