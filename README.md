@@ -221,4 +221,138 @@ npx hardhat test
 ```
 
 ### Development
-- **Contract Development**: All contracts are in the `
+- **Contract Development**: All contracts are in the `contracts/` directory
+- **Testing**: Comprehensive test suite in `test/` directory
+- **Deployment**: Scripts and modules in `scripts/` and `ignition/` directories
+- **Documentation**: Additional docs in `docs/` directory
+
+## 📁 Repository Structure
+```
+aethercycle-protocol/
+├── contracts/           # Smart contracts grouped by domain
+│   ├── core/           # Foundation layer contracts
+│   ├── staking/        # Distribution layer contracts
+│   ├── distribution/   # Utility layer contracts
+│   ├── nft/            # NFT contracts
+│   ├── launch/         # Launch contracts
+│   ├── airdrop/        # Airdrop contracts
+│   ├── vesting/        # Vesting contracts
+│   ├── bounty/         # Bounty contracts
+│   ├── lottery/        # Lottery contracts
+│   ├── interfaces/     # Contract interfaces
+│   └── mocks/          # Mock contracts for testing
+├── scripts/            # Deployment scripts and utilities
+│   └── deployment/     # Deployment scripts
+├── test/               # Unit & integration tests
+│   ├── unit/          # Individual contract tests
+│   ├── integration/   # Multi-contract interaction tests
+│   └── gas-analysis.test.js  # Gas analysis tests
+├── ignition/           # Deployment modules for testing
+├── docs/              # Additional documentation
+├── Aethercycle-Whitepaper/  # Protocol whitepaper
+└── LICENSE            # MIT License
+```
+
+## 🚧 Development Status
+- ✅ **Core Contracts**: Fully developed and tested
+- ✅ **Staking Contracts**: Complete with comprehensive test coverage
+- ✅ **TokenDistributor**: One-time distribution with precise allocations
+- ✅ **Unit Tests**: 214 tests covering all core functionality
+- ✅ **Integration Tests**: 7 core contracts with realistic scenarios
+- ✅ **Gas Analysis**: Comprehensive gas usage and cost analysis
+- 🔄 **Additional Contracts**: 9+ contracts planned for future development
+- 🔄 **Governance**: Community governance framework in development
+- 🔄 **Analytics**: Advanced analytics and dashboard development
+
+## ⛽ Gas Analysis & Optimization
+
+The protocol has been extensively analyzed for gas efficiency and cost optimization:
+
+### AEC Token Gas Usage
+- **Transfer**: 37,057 gas ⚡ (Super efficient!)
+- **Approve**: 46,474 gas ⚡ (Standard)
+- **TransferFrom**: 50,288 gas ⚡ (Standard)
+- **Burn**: 34,062 gas ⚡ (Super efficient!)
+
+### TokenDistributor Gas Usage
+- **Set Token Address**: 292,766 gas
+- **Set Recipients**: 273,771 gas
+- **Distribute**: 329,534 gas (Very efficient for one-time operation!)
+
+### Cost Analysis
+**Base Network (Recommended):**
+- Distribute: $0.01-0.13 USD (Super cheap!)
+- Transfer: $0.0001-0.001 USD per transaction
+
+**Ethereum Mainnet:**
+- Distribute: $6.59-65.91 USD (Reasonable for one-time)
+- Transfer: $0.07-0.70 USD per transaction
+
+### Gas Optimization Features
+- **Efficient Algorithms**: Optimized for cost-effective operations
+- **Batch Operations**: Reduced gas costs for multiple transactions
+- **Storage Optimization**: Minimal on-chain data storage
+- **Smart Caching**: Intelligent caching mechanisms for frequently accessed data
+
+## 📊 Analytics & Monitoring
+
+### Gas Analysis Tools
+- **Hardhat Gas Reporter**: Automatic gas usage reporting
+- **Gas Analysis Scripts**: Custom analysis for specific operations
+- **Cost Calculators**: Network-specific cost analysis
+
+### Performance Monitoring
+- **Contract Size Analysis**: Optimized contract deployment
+- **Gas Usage Tracking**: Real-time gas consumption monitoring
+- **Cost Optimization**: Continuous improvement recommendations
+
+## 🚀 Deployment
+
+### Prerequisites
+- Node.js 18+
+- Hardhat
+- Environment variables configured
+
+### Environment Setup
+Create a `.env` file with:
+```env
+PRIVATE_KEY=your_private_key
+BASE_SEPOLIA_RPC=your_rpc_url
+BASE_RPC=your_mainnet_rpc_url
+BASESCAN_API_KEY=your_api_key
+```
+
+### Deployment Scripts
+```bash
+# Deploy to testnet
+npx hardhat run scripts/deployment/deploy-testnet.js --network base_sepolia
+
+# Deploy to mainnet
+npx hardhat run scripts/deployment/deploy-mainnet.js --network base
+```
+
+### Verification
+```bash
+# Verify contracts on Basescan
+npx hardhat verify --network base CONTRACT_ADDRESS [constructor_args]
+```
+
+## 📄 License
+
+MIT License - see LICENSE file for details
+
+## 🔗 Links
+
+- **GitHub**: https://github.com/aethercycle/aethercycle-protocol
+- **Documentation**: See `docs/` folder
+- **Whitepaper**: `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`
+
+## 👤 Author
+
+**Fukuhi**  
+- **Twitter**: [@aethercycle](https://twitter.com/aethercycle)
+- **Website**: [aethercycle.xyz](https://aethercycle.xyz)
+
+---
+
+**Built by the AetherCycle Team**
