@@ -26,13 +26,14 @@ contract TokenDistributor is ReentrancyGuard {
     uint256 public constant TOTAL_SUPPLY = 888_888_888 * 1e18;
     
     /// @notice Distribution percentages (basis points)
-    uint256 public constant LIQUIDITY_BPS = 700;           // 7% - Initial liquidity
+    uint256 public constant LIQUIDITY_BPS = 600;           // 6% - Initial liquidity
     uint256 public constant FAIR_LAUNCH_BPS = 700;         // 7% - Fair launch
-    uint256 public constant AIRDROP_BPS = 200;             // 2% - Airdrop
-    uint256 public constant STAKING_BPS = 4000;            // 40% - Staking rewards (LP + Token + NFT)
+    uint256 public constant AIRDROP_BPS = 800;             // 8% - Contributor airdrop
+    uint256 public constant STAKING_BPS = 4000;            // 40% - Ecosystem rewards (LP + Token + NFT)
     uint256 public constant ENDOWMENT_BPS = 3500;          // 35% - Perpetual endowment
-    uint256 public constant TEAM_BPS = 100;                // 1% - Team (5yr cliff)
-    uint256 public constant TREASURY_BPS = 300;            // 3% - Protocol treasury
+    uint256 public constant TEAM_BPS = 100;                // 1% - Founder (5yr cliff)
+    uint256 public constant SECURITY_BOUNTY_BPS = 200;     // 2% - Security bounty
+    uint256 public constant LOTTERY_BPS = 100;             // 1% - Lottery/Gambit
     
     /// @notice Basis points divisor
     uint256 public constant BASIS_POINTS = 10000;
@@ -66,7 +67,8 @@ contract TokenDistributor is ReentrancyGuard {
     address public airdropClaimAddress;
     address public perpetualEndowmentAddress;
     address public founderVestingAddress;
-    address public protocolTreasuryAddress;
+    address public securityBountyAddress;
+    address public lotteryAddress;
     address public perpetualEngineAddress;
     
     // Staking contracts
@@ -154,7 +156,8 @@ contract TokenDistributor is ReentrancyGuard {
         address _airdropClaim,
         address _perpetualEndowment,
         address _founderVesting,
-        address _protocolTreasury,
+        address _securityBounty,
+        address _lottery,
         address _perpetualEngine,
         address _stakingLP,
         address _stakingToken,
@@ -166,7 +169,8 @@ contract TokenDistributor is ReentrancyGuard {
         require(_airdropClaim != address(0), "TokenDistributor: Invalid airdrop");
         require(_perpetualEndowment != address(0), "TokenDistributor: Invalid endowment");
         require(_founderVesting != address(0), "TokenDistributor: Invalid vesting");
-        require(_protocolTreasury != address(0), "TokenDistributor: Invalid treasury");
+        require(_securityBounty != address(0), "TokenDistributor: Invalid security bounty");
+        require(_lottery != address(0), "TokenDistributor: Invalid lottery");
         require(_perpetualEngine != address(0), "TokenDistributor: Invalid engine");
         require(_stakingLP != address(0), "TokenDistributor: Invalid LP staking");
         require(_stakingToken != address(0), "TokenDistributor: Invalid token staking");
@@ -178,7 +182,8 @@ contract TokenDistributor is ReentrancyGuard {
         airdropClaimAddress = _airdropClaim;
         perpetualEndowmentAddress = _perpetualEndowment;
         founderVestingAddress = _founderVesting;
-        protocolTreasuryAddress = _protocolTreasury;
+        securityBountyAddress = _securityBounty;
+        lotteryAddress = _lottery;
         perpetualEngineAddress = _perpetualEngine;
         stakingLPAddress = _stakingLP;
         stakingTokenAddress = _stakingToken;
@@ -204,10 +209,11 @@ contract TokenDistributor is ReentrancyGuard {
         // Execute all distributions
         _distribute(liquidityDeployerAddress, allocations["liquidity"], "Initial Liquidity");
         _distribute(fairLaunchAddress, allocations["fairLaunch"], "Fair Launch");
-        _distribute(airdropClaimAddress, allocations["airdrop"], "Airdrop");
+        _distribute(airdropClaimAddress, allocations["airdrop"], "Contributor Airdrop");
         _distribute(perpetualEndowmentAddress, allocations["endowment"], "Perpetual Endowment");
         _distribute(founderVestingAddress, allocations["team"], "Founder Vesting");
-        _distribute(protocolTreasuryAddress, allocations["treasury"], "Protocol Treasury");
+        _distribute(securityBountyAddress, allocations["securityBounty"], "Security Bounty");
+        _distribute(lotteryAddress, allocations["lottery"], "Lottery/Gambit");
         
         // Staking distributions
         _distribute(stakingLPAddress, allocations["stakingLP"], "LP Staking Rewards");
@@ -238,7 +244,8 @@ contract TokenDistributor is ReentrancyGuard {
         allocations["airdrop"] = (TOTAL_SUPPLY * AIRDROP_BPS) / BASIS_POINTS;
         allocations["endowment"] = (TOTAL_SUPPLY * ENDOWMENT_BPS) / BASIS_POINTS;
         allocations["team"] = (TOTAL_SUPPLY * TEAM_BPS) / BASIS_POINTS;
-        allocations["treasury"] = (TOTAL_SUPPLY * TREASURY_BPS) / BASIS_POINTS;
+        allocations["securityBounty"] = (TOTAL_SUPPLY * SECURITY_BOUNTY_BPS) / BASIS_POINTS;
+        allocations["lottery"] = (TOTAL_SUPPLY * LOTTERY_BPS) / BASIS_POINTS;
         
         // Staking allocations (40% total, including NFT rewards)
         uint256 totalStaking = (TOTAL_SUPPLY * STAKING_BPS) / BASIS_POINTS;
@@ -252,7 +259,8 @@ contract TokenDistributor is ReentrancyGuard {
         emit AllocationCalculated("airdrop", allocations["airdrop"]);
         emit AllocationCalculated("endowment", allocations["endowment"]);
         emit AllocationCalculated("team", allocations["team"]);
-        emit AllocationCalculated("treasury", allocations["treasury"]);
+        emit AllocationCalculated("securityBounty", allocations["securityBounty"]);
+        emit AllocationCalculated("lottery", allocations["lottery"]);
         emit AllocationCalculated("stakingLP", allocations["stakingLP"]);
         emit AllocationCalculated("stakingToken", allocations["stakingToken"]);
         emit AllocationCalculated("stakingNFT", allocations["stakingNFT"]);
@@ -276,7 +284,8 @@ contract TokenDistributor is ReentrancyGuard {
         total += distributed[airdropClaimAddress];
         total += distributed[perpetualEndowmentAddress];
         total += distributed[founderVestingAddress];
-        total += distributed[protocolTreasuryAddress];
+        total += distributed[securityBountyAddress];
+        total += distributed[lotteryAddress];
         total += distributed[stakingLPAddress];
         total += distributed[stakingTokenAddress];
         total += distributed[stakingNFTAddress];
@@ -310,7 +319,8 @@ contract TokenDistributor is ReentrancyGuard {
         uint256 airdrop,
         uint256 endowment,
         uint256 team,
-        uint256 treasury,
+        uint256 securityBounty,
+        uint256 lottery,
         uint256 stakingLP,
         uint256 stakingToken,
         uint256 stakingNFT
@@ -320,7 +330,8 @@ contract TokenDistributor is ReentrancyGuard {
         airdrop = allocations["airdrop"];
         endowment = allocations["endowment"];
         team = allocations["team"];
-        treasury = allocations["treasury"];
+        securityBounty = allocations["securityBounty"];
+        lottery = allocations["lottery"];
         stakingLP = allocations["stakingLP"];
         stakingToken = allocations["stakingToken"];
         stakingNFT = allocations["stakingNFT"];
@@ -335,7 +346,8 @@ contract TokenDistributor is ReentrancyGuard {
         sum += allocations["airdrop"];
         sum += allocations["endowment"];
         sum += allocations["team"];
-        sum += allocations["treasury"];
+        sum += allocations["securityBounty"];
+        sum += allocations["lottery"];
         sum += allocations["stakingLP"];
         sum += allocations["stakingToken"];
         sum += allocations["stakingNFT"];
