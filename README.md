@@ -7,9 +7,9 @@ AetherCycle is an autonomous DeFi protocol powered by the **Endowment Engine**, 
 AetherCycle represents a paradigm shift in DeFi sustainability, combining:
 - **Mathematical Sustainability**: Built-in decay mechanisms and endowment reserves
 - **Anti-Speculation Design**: Long-term value creation over short-term gains
-- **Community-Owned**: Decentralized governance and autonomous operation
+- **Fully Decentralized**: No human intervention, no centralized controls, no upgrade mechanisms
 - **Perpetual Engine**: Self-sustaining economic model with continuous value generation
-- **Fully Autonomous**: Once launched, the protocol operates independently without human intervention or modifications
+- **Fully Autonomous**: Once launched, the protocol operates independently without any human intervention or modifications
 
 ## 📜 Whitepaper
 - `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`
@@ -106,12 +106,6 @@ LP token staking with:
 - **Community Governance**: Transparent and auditable management
 
 ## 🔒 Security Features
-
-### Access Control
-- **Role-Based Permissions**: Granular access control for different functions
-- **Emergency Functions**: Rapid response capabilities for critical situations
-- **Upgrade Mechanisms**: Secure contract upgradeability where needed
-- **Multi-Signature Support**: Enhanced security for critical operations
 
 ### Anti-Manipulation
 - **Rate Limiting**: Protection against rapid transactions and bots
