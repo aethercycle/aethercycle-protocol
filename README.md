@@ -61,6 +61,41 @@ A decentralized endowment fund featuring:
 - **Future Balance Projections**: Advanced analytics and forecasting
 - **Community Governance**: Transparent and auditable fund management
 
+### TokenDistributor
+The one-time distribution contract responsible for the initial allocation of the entire AEC token supply (888,888,888 AEC) according to the protocol's immutable tokenomics. This contract ensures precise distribution to all protocol components with hardcoded allocations for staking and endowment contracts to prevent any deployment or initialization failures.
+
+**Key Features:**
+- **Precise Allocations**: Hardcoded amounts for staking and endowment contracts to match their exact requirements
+- **Dust Management**: Any rounding differences are allocated to the lottery to ensure the total distribution equals exactly 888,888,888 AEC
+- **One-Time Use**: Immutable distribution that becomes a historical artifact after completion
+- **Transparent**: All allocations are calculated upfront and emitted as events for verification
+
+**Allocation Breakdown:**
+
+| Category        | Amount (AEC)   | Description                  | Type        |
+|-----------------|---------------|------------------------------|-------------|
+| Liquidity       | 53,333,333.28 | Initial liquidity            | Percentage  |
+| Fair Launch     | 62,222,222.16 | Fair launch                  | Percentage  |
+| Airdrop         | 71,111,111.04 | Contributor airdrop          | Percentage  |
+| Endowment       | 311,111,111   | Perpetual endowment          | **Hardcoded** |
+| Team            | 8,888,888.88  | Founder vesting (5yr cliff)  | Percentage  |
+| Security Bounty | 17,777,777.6  | Security bounty              | Percentage  |
+| Lottery         | 8,933,333.88  | Lottery/Gambit (dust)        | **Calculated** |
+| Staking LP      | 177,777,777   | LP Staking rewards           | **Hardcoded** |
+| Staking Token   | 133,333,333   | Token Staking rewards        | **Hardcoded** |
+| Staking NFT     | 44,400,000    | NFT Staking rewards          | **Hardcoded** |
+
+**Distribution Flow:**
+1. AEC Token mints entire supply to TokenDistributor
+2. Recipient addresses are configured (one-time setup)
+3. Distribution executes all transfers in a single transaction
+4. Contract becomes immutable historical artifact
+
+**Testing:**
+- **Unit Tests**: 23 tests covering deployment, allocation calculations, recipient configuration, and distribution execution
+- **Integration Tests**: 3 tests validating distribution to real contracts and endowment initialization
+- **All tests pass**: Confirming precise allocations and successful distribution to all protocol components
+
 ## 🧩 Staking Contracts
 
 ### AECStakingNFT
@@ -133,8 +168,9 @@ LP token staking with:
 - **AECToken**: 36 tests covering tax system, PerpetualEngine integration, configuration, security, and edge cases
 - **PerpetualEndowment**: 18 tests covering initialization, fund releases, configuration, analytics, and mathematical sustainability
 - **PerpetualEngine**: 39 tests covering cycle processing, reward distribution, endowment integration, deployer privileges, configuration, and economic model validation
+- **TokenDistributor**: 23 tests covering deployment, allocation calculations, recipient configuration, distribution execution, and precision validation
 
-**Total**: 191 comprehensive unit tests across all core and staking contracts.
+**Total**: 214 comprehensive unit tests across all core, staking, and distribution contracts.
 
 ### Integration Test Coverage
 The protocol includes integration tests that validate the interaction between multiple core contracts in realistic scenarios.
@@ -146,6 +182,7 @@ The protocol includes integration tests that validate the interaction between mu
 - AECStakingLP
 - AECStakingNFT
 - AECStakingToken
+- TokenDistributor
 
 **Integration scenarios tested:**
 - Staking and claiming rewards in all pools (LP, Token, NFT)
@@ -155,6 +192,9 @@ The protocol includes integration tests that validate the interaction between mu
 - Analytics and pool statistics
 - Permissioning (only engine can call certain functions)
 - Multi-user and multi-tier reward logic
+- **Token distribution to all protocol components with precise allocations**
+- **Endowment initialization after receiving exact token amounts**
+- **Verification of total distribution equals total supply**
 
 ### Running Tests
 ```bash
@@ -219,7 +259,7 @@ aethercycle-protocol/
 ├── contracts/           # Smart contracts grouped by domain
 │   ├── core/           # Foundation layer contracts
 │   ├── staking/        # Distribution layer contracts
-│   ├── distribution/   # Utility layer contracts
+│   ├── distribution/   # Token distribution contracts
 │   └── gaming/         # Additional utility contracts
 ├── scripts/            # Deployment scripts and utilities
 ├── test/               # Unit & integration tests
