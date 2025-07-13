@@ -58,11 +58,23 @@ module.exports = {
   },
   
   gasReporter: {
-    enabled: process.env.REPORT_GAS !== undefined
+    enabled: true, // Always enabled for gas analysis
+    currency: 'USD',
+    gasPrice: 20, // 20 gwei
+    token: 'ETH',
+    gasPriceApi: "https://api.etherscan.io/api?module=proxy&action=eth_gasPrice",
+    showMethodSig: true,
+    showTimeSpent: true,
+    excludeContracts: ['MockERC20', 'MockERC721', 'MockContract'],
+    src: "./contracts/",
+    outputFile: "gas-report.txt",
+    noColors: false,
+    coinmarketcap: process.env.COINMARKETCAP_API_KEY || ""
   },
   
   contractSizer: {
     alphaSort: true,
-    runOnCompile: true
+    runOnCompile: true,
+    disambiguatePaths: false
   }
 };
