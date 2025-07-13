@@ -32,6 +32,7 @@ The protocol consists of **15+ smart contracts** organized across four functiona
 ### Utility Layer
 - **Revenue Distribution**: Automated fee collection and distribution
 - **Analytics Engine**: Real-time protocol statistics and projections
+- **AccountabilityDAO**: Limited governance for founder vesting extension and burn only
 
 ### Security Layer
 - **Rate Limiting**: Anti-fragmentation and manipulation protection
@@ -58,6 +59,27 @@ A decentralized endowment fund featuring:
 - **Mathematical Sustainability**: Built-in reserves and growth mechanisms
 - **Engine-Controlled Releases**: Automated and conditional fund distributions
 - **Future Balance Projections**: Advanced analytics and forecasting
+
+## 🏛️ AccountabilityDAO
+
+The **AetheriaAccountabilityDAO** provides **limited governance scope** for community oversight of founder compensation only:
+
+### Governance Scope
+- **Founder Vesting Extension**: Community can extend founder vesting by up to 2 additional years
+- **Founder Burn**: Community can burn founder tokens as accountability mechanism
+- **Simple Binary Decisions**: Extend or burn - easy to understand and participate
+
+### No Protocol Governance
+- ❌ **No parameter changes** - protocol parameters are immutable
+- ❌ **No economic model changes** - mathematical sustainability is guaranteed
+- ❌ **No upgrade mechanisms** - contracts are immutable forever
+- ❌ **No emergency functions** - protocol operates autonomously
+
+### Community Protection
+- **Strongest anti-rug mechanism** in DeFi history
+- **99% community ownership** vs industry standard 70-80%
+- **Mathematical accountability** replaces human promises
+- **Limited scope prevents broader protocol damage**
 
 ## 🧩 Staking Contracts
 
