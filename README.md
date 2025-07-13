@@ -22,11 +22,17 @@ AetherCycle is an autonomous DeFi protocol powered by the **Endowment Engine**, 
 - Rewards are distributed fairly per NFT/token. Stakers can claim rewards or unstake at any time—no lockups, no penalties.
 - The decay mechanism ensures sustainable, non-inflationary rewards.
 
+## 🏛️ Core Contracts
+
+- **PerpetualEndowment**: Decentralized endowment fund with mathematical sustainability. Features engine-controlled releases, analytics, and future balance projections.
+- **PerpetualEngine**: Autonomous economic engine that manages reward distribution and endowment releases.
+
 ## 🧪 Testing
 
 - All core and staking contracts are covered by comprehensive unit tests.
 - **AECStakingNFT**: 37 tests covering staking, unstaking, reward calculation, decay, bonus rewards, edge cases, and realistic mass staking scenarios.
 - **AECStakingToken**: 37 tests covering tiered staking, dual rewards, decay, tier upgrades, and mathematical sustainability.
+- **PerpetualEndowment**: 18 tests covering initialization, fund releases, configuration, analytics, and mathematical sustainability.
 - To run the tests:
   ```
   npx hardhat test
