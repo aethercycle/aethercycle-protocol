@@ -48,14 +48,17 @@ contract TokenDistributor is ReentrancyGuard {
     // IMMUTABLES
     // ================================================================
     
-    /// @notice AEC token contract
-    IERC20 public immutable aecToken;
+    /// @notice AEC token contract (can be updated once)
+    IERC20 public aecToken;
     
     /// @notice Deployment timestamp
     uint256 public immutable deploymentTime;
     
     /// @notice Deployer (only for initial setup)
     address public immutable deployer;
+    
+    /// @notice Track if AEC token address has been set
+    bool public aecTokenSet;
 
     // ================================================================
     // STATE VARIABLES - RECIPIENT ADDRESSES
@@ -98,10 +101,16 @@ contract TokenDistributor is ReentrancyGuard {
     event DistributionExecuted(address indexed recipient, uint256 amount, string allocation);
     event DistributionCompleted(uint256 timestamp, uint256 totalDistributed);
     event AllocationCalculated(string category, uint256 amount);
+    event AECTokenAddressSet(address indexed tokenAddress);
 
     // ================================================================
     // MODIFIERS
     // ================================================================
+    
+    modifier aecTokenReady() {
+        require(aecTokenSet, "TokenDistributor: AEC token not set");
+        _;
+    }
     
     modifier onlyDeployer() {
         require(msg.sender == deployer, "TokenDistributor: Only deployer");
@@ -129,22 +138,40 @@ contract TokenDistributor is ReentrancyGuard {
     
     /**
      * @notice Initialize the distributor
-     * @param _aecToken Address of AEC token
+     * @param _aecToken Address of AEC token (can be zero for two-step deployment)
      */
     constructor(address _aecToken) {
-        require(_aecToken != address(0), "TokenDistributor: Invalid token");
-        
-        aecToken = IERC20(_aecToken);
         deploymentTime = block.timestamp;
         deployer = msg.sender;
         
-        // Pre-calculate all allocations for transparency
-        _calculateAllocations();
+        if (_aecToken != address(0)) {
+            aecToken = IERC20(_aecToken);
+            aecTokenSet = true;
+            // Pre-calculate all allocations for transparency
+            _calculateAllocations();
+        }
     }
 
     // ================================================================
     // CONFIGURATION FUNCTIONS
     // ================================================================
+    
+    /**
+     * @notice Set AEC token address (one-time only, for two-step deployment)
+     * @param _aecToken Address of AEC token
+     */
+    function setAECTokenAddress(address _aecToken) external onlyDeployer {
+        require(!aecTokenSet, "TokenDistributor: AEC token already set");
+        require(_aecToken != address(0), "TokenDistributor: Invalid token address");
+        
+        aecToken = IERC20(_aecToken);
+        aecTokenSet = true;
+        
+        // Pre-calculate all allocations for transparency
+        _calculateAllocations();
+        
+        emit AECTokenAddressSet(_aecToken);
+    }
     
     /**
      * @notice Set all recipient addresses (one-time only)
@@ -162,7 +189,7 @@ contract TokenDistributor is ReentrancyGuard {
         address _stakingLP,
         address _stakingToken,
         address _stakingNFT
-    ) external onlyDeployer recipientsNotSet {
+    ) external onlyDeployer recipientsNotSet aecTokenReady {
         // Validate all addresses
         require(_liquidityDeployer != address(0), "TokenDistributor: Invalid liquidity deployer");
         require(_fairLaunch != address(0), "TokenDistributor: Invalid fair launch");
@@ -201,7 +228,7 @@ contract TokenDistributor is ReentrancyGuard {
      * @notice Execute the distribution (one-time only)
      * @dev Distributes all tokens according to hardcoded allocations
      */
-    function distribute() external nonReentrant recipientsReady distributionNotComplete {
+    function distribute() external nonReentrant recipientsReady distributionNotComplete aecTokenReady {
         // Verify we have the tokens
         uint256 balance = aecToken.balanceOf(address(this));
         require(balance >= TOTAL_SUPPLY, "TokenDistributor: Insufficient tokens");
