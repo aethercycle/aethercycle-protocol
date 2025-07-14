@@ -27,7 +27,7 @@ describe("Full Protocol Integration", function () {
         
         // Get token distributor address - owner is the token distributor
         tokenDistributor = owner; // owner is the token distributor, not the contract itself
-        
+
         // Deploy temporary staking contracts first (we'll redeploy them later)
         const MockContract = await ethers.getContractFactory("MockContract");
         const tempStakingLP = await MockContract.deploy();
