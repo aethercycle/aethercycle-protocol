@@ -266,6 +266,17 @@ There are two tests in `test/unit/AECStakingNFT.test.js` that are intentionally 
 
 This is a standard practice in DeFi projects to ensure transparency and maintain comprehensive coverage elsewhere. All other tests are passing and the protocol logic is fully covered for realistic scenarios.
 
+## 🧪 Test Coverage & Status
+
+- **Integration Tests:** 9 core contracts (AECToken, PerpetualEngine, PerpetualEndowment, AECStakingLP, AECStakingToken, AECStakingNFT, TokenDistributor, AetheriaNFT, LiquidityDeployer) — **All passing**
+- **Edge Case Tests:** TokenDistributor & LiquidityDeployer — **All passing** (see `test/edge/`)
+- **Test Structure:**
+  - `test/unit/` — Unit tests per contract
+  - `test/integration/` — Multi-contract integration
+  - `test/edge/` — Edge/negative/permission tests
+
+> See test output and details in each folder for up-to-date status.
+
 ## 🚀 Getting Started
 
 ### Prerequisites
