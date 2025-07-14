@@ -31,9 +31,8 @@ Instead of asking "Will the team deliver?" or "Will founders honor commitments?"
 - **Self-sustaining economic cycles** with compound growth effects
 
 ## 📜 Whitepaper
-- `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`
+- `Aethercycle-Whitepaper/AEC Whitepaper v2.0 - Complete Document.pdf`https://gateway.pinata.cloud/ipfs/bafybeibgu5efmn7ofg43eqkwe3sdinvu6arnw3aeoanlyyf76wb46xuwme
 - `Aethercycle-Whitepaper/Proof.md` (includes commit hash & author)
-
 ## 🏗️ Architecture
 
 The protocol consists of **15+ smart contracts** organized across four functional layers:
