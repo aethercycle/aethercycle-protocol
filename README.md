@@ -94,6 +94,9 @@ A minimalistic, imageless ERC721 NFT representing the highest yield tier and exc
 
 **File:** `contracts/nft/AetheriaNFT.sol`
 
+### LiquidityDeployer
+Automates the one-time creation of the AEC/USDC liquidity pool after the fair launch, stakes all LP tokens for the protocol, and ensures permanent protocol-owned liquidity. Includes full unit test coverage and custom mocks for Uniswap and staking contracts.
+
 ## 🏛️ AccountabilityDAO
 
 The **AetheriaAccountabilityDAO** provides **limited governance scope** for community oversight of founder compensation only:
@@ -190,6 +193,8 @@ The PerpetualEngine processes all protocol revenue through immutable mathematica
 - **TokenDistributor**: 23 tests covering deployment, allocation calculations, recipient configuration, distribution execution, and precision validation
 - **AetheriaNFT**: 14 tests covering deployment, minting (single & batch), payment, metadata, view functions, transfer, and edge cases (max supply, allowance, etc.)
 
+**LiquidityDeployer**: 10 tests covering deployment, configuration, initial liquidity deployment, staking, edge cases, and event emission with full Uniswap/staking mocks.
+
 **Total**: 228 comprehensive unit tests across all core and staking contracts.
 
 ### Integration Test Coverage
@@ -249,6 +254,13 @@ npx hardhat test test/unit/PerpetualEngine.test.js
 ```bash
 REPORT_GAS=true npx hardhat test
 ```
+
+#### LiquidityDeployer Unit Test
+```bash
+npx hardhat test test/unit/LiquidityDeployer.test.js
+```
+
+> Includes custom mock contracts for UniswapV2Router02, UniswapV2Factory, and IAECStakingLP to enable full simulation of the liquidity deployment process in unit tests.
 
 ### ⚠️ Skipped Tests & Test Environment Limitations
 There are two tests in `test/unit/AECStakingNFT.test.js` that are intentionally skipped. These tests cover base reward decay and rewardPerNFT logic for a single staked NFT over short simulated time periods. Due to integer math and the limitations of the test environment, these tests do not reflect mainnet behavior and are skipped for transparency. See comments in the test file (look for `it.skip`) for details.
