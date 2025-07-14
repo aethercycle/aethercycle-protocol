@@ -82,6 +82,18 @@ A decentralized endowment fund featuring:
 - **Engine-Controlled Releases**: Automated and conditional fund distributions
 - **Future Balance Projections**: Advanced analytics and forecasting
 
+### AetheriaNFT
+A minimalistic, imageless ERC721 NFT representing the highest yield tier and exclusive membership in the AetherCycle ecosystem.
+
+- **Max Supply:** 500 (eternal scarcity)
+- **Mint Price:** 1,000,000 AEC (paid directly to PerpetualEngine)
+- **No Metadata:** No image, no URI, pure on-chain ownership
+- **No Admin/Owner:** Fully autonomous, immutable, no emergency functions
+- **Batch Minting:** Up to 10 NFTs per transaction
+- **Events:** Detailed mint and transfer events for analytics
+
+**File:** `contracts/nft/AetheriaNFT.sol`
+
 ## 🏛️ AccountabilityDAO
 
 The **AetheriaAccountabilityDAO** provides **limited governance scope** for community oversight of founder compensation only:
@@ -176,8 +188,9 @@ The PerpetualEngine processes all protocol revenue through immutable mathematica
 - **PerpetualEndowment**: 18 tests covering initialization, fund releases, configuration, analytics, and mathematical sustainability
 - **PerpetualEngine**: 39 tests covering cycle processing, reward distribution, endowment integration, deployer privileges, configuration, and economic model validation
 - **TokenDistributor**: 23 tests covering deployment, allocation calculations, recipient configuration, distribution execution, and precision validation
+- **AetheriaNFT**: 14 tests covering deployment, minting (single & batch), payment, metadata, view functions, transfer, and edge cases (max supply, allowance, etc.)
 
-**Total**: 214 comprehensive unit tests across all core and staking contracts.
+**Total**: 228 comprehensive unit tests across all core and staking contracts.
 
 ### Integration Test Coverage
 The protocol includes integration tests that validate the interaction between multiple core contracts in realistic scenarios.
@@ -309,9 +322,9 @@ aethercycle-protocol/
 - ✅ **Staking Contracts**: Complete with comprehensive test coverage
 - ✅ **TokenDistributor**: One-time distribution with precise allocations
 - ✅ **Unit Tests**: 214 tests covering all core functionality
-- ✅ **Integration Tests**: 7 core contracts with realistic scenarios
+- ✅ **Integration Tests**: 8 core contracts with realistic scenarios
 - ✅ **Gas Analysis**: Comprehensive gas usage and cost analysis
-- 🔄 **Additional Contracts**: 9+ contracts planned for future development
+- 🔄 **Additional Contracts**: 7+ contracts planned for future development
 - 🔄 **Analytics**: Advanced analytics and dashboard development
 
 ## ⛽ Gas Analysis & Optimization
