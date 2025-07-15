@@ -140,8 +140,6 @@ LP token staking with:
 - **Decay Mechanism**: Sustainable reward distribution
 - **Liquidity Incentives**: Enhanced rewards for protocol liquidity
 
-> **Note on Emergency Pause:**
-> The AECStakingLP contract includes an emergency pause function that is only callable by the `perpetualEngine` contract address. However, the perpetualEngine contract is fully autonomous and does **not** expose any function to call or trigger the pause. As a result, in practice, the pause function is unreachable and cannot be used by any entity (including owner, deployer, admin, or governance). This ensures there is **no centralized control or freeze risk**, and the protocol remains fully decentralized.
 
 ## 💰 Economic Model
 
@@ -222,6 +220,12 @@ The protocol includes integration tests that validate the interaction between mu
 - Token distribution to all protocol components with precise allocations
 - Endowment initialization after receiving exact token amounts
 - Verification of total distribution equals total supply
+
+### Edge Case & Negative Testing
+
+- The protocol includes a dedicated edge/negative test suite for AECStakingLP, located at `test/edge/AECStakingLPEdgeCases.test.js`.
+- This suite covers all critical edge cases and negative scenarios, including permissioning, staking/withdrawal limits, tier logic, engine-only functions, and the unreachable emergency pause.
+- All tests are passing, and skipped tests are documented with reasons (e.g., unreachable code or protocol design).
 
 ### Running Tests
 

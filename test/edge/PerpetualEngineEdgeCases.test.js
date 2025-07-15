@@ -32,6 +32,7 @@ describe("PerpetualEngine Edge & Negative Cases", function () {
       aecToken.target,
       owner.address,
       owner.address,
+      user2.address,
       ethers.parseEther("177777777")
     );
     // Deploy PerpetualEngine

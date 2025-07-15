@@ -58,12 +58,21 @@ describe("Nine Core Contracts Integration", function () {
         const AetheriaNFT = await ethers.getContractFactory("AetheriaNFT");
         aetheriaNFT = await AetheriaNFT.deploy(aecToken.target, perpetualEngine.target);
 
-        // Deploy AECStakingLP with correct engine address
+        // Deploy LiquidityDeployer first
+        const LiquidityDeployer = await ethers.getContractFactory("LiquidityDeployer");
+        liquidityDeployer = await LiquidityDeployer.deploy(
+            aecToken.target,
+            mockStablecoin.target,
+            mockRouter.target
+        );
+
+        // Deploy AECStakingLP dengan liquidityDeployer.target
         const AECStakingLP = await ethers.getContractFactory("AECStakingLP");
         stakingLP = await AECStakingLP.deploy(
             aecToken.target,
             mockLPToken.target,
             perpetualEngine.target,
+            liquidityDeployer.target,
             LP_STAKING_ALLOCATION
         );
 
@@ -90,14 +99,6 @@ describe("Nine Core Contracts Integration", function () {
             aecToken.target,
             perpetualEngine.target,
             ENDOWMENT_AMOUNT
-        );
-
-        // Deploy LiquidityDeployer
-        const LiquidityDeployer = await ethers.getContractFactory("LiquidityDeployer");
-        liquidityDeployer = await LiquidityDeployer.deploy(
-            aecToken.target,
-            mockStablecoin.target,
-            mockRouter.target
         );
 
         // Set all recipient addresses in TokenDistributor

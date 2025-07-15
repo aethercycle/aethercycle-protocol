@@ -61,6 +61,7 @@ describe("Simple Integration Test", function () {
             aecToken.target,                 // _aecToken
             mockPair.target,                 // _lpToken (AEC/USDC pair)
             perpetualEngine.target,          // _perpetualEngine (correct address)
+            owner.address,                   // _liquidityDeployer
             ethers.parseEther("177777777")   // _initialAllocation
         );
 

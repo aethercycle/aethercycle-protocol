@@ -51,6 +51,7 @@ describe("TokenDistributor Integration", function () {
                 aecToken.target,
                 user1.address, // Mock LP token address
                 user1.address, // Mock engine address
+                owner.address, // liquidityDeployer
                 EXPECTED_ALLOCATIONS.stakingLP
             );
             
@@ -121,6 +122,7 @@ describe("TokenDistributor Integration", function () {
                 aecToken.target,
                 user1.address,
                 user1.address,
+                owner.address,
                 EXPECTED_ALLOCATIONS.stakingLP
             );
             
@@ -174,6 +176,7 @@ describe("TokenDistributor Integration", function () {
                 aecToken.target,
                 user1.address,
                 user1.address,
+                owner.address,
                 EXPECTED_ALLOCATIONS.stakingLP
             );
             

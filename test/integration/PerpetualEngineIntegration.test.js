@@ -56,6 +56,7 @@ describe("PerpetualEngine Full Integration", function () {
             aecToken.target,
             mockLPToken.target,
             perpetualEngine.target,
+            owner.address,
             ethers.parseEther("177777777")
         );
 

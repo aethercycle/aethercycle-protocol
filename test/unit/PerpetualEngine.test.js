@@ -48,12 +48,17 @@ describe("PerpetualEngine", function () {
       ethers.parseEther("311111111") // _initialAmount
     );
 
+    // Deploy mock LiquidityDeployer
+    const MockLiquidityDeployer = await ethers.getContractFactory("MockContract");
+    const mockLiquidityDeployer = await MockLiquidityDeployer.deploy();
+
     // Deploy AECStakingLP
     const AECStakingLP = await ethers.getContractFactory("AECStakingLP");
     aecStakingLP = await AECStakingLP.deploy(
       aecToken.target,
       mockUniswapPair.target,
       owner.address, // temporary engine address
+      mockLiquidityDeployer.target, // liquidityDeployer
       ethers.parseEther("177777777")
     );
 

@@ -32,6 +32,7 @@ describe("AECStakingLP", function () {
       aecToken.target,
       lpToken.target,
       mockEngine.target,
+      owner.address,
       INITIAL_ALLOCATION
     );
 
@@ -196,7 +197,7 @@ describe("AECStakingLP", function () {
 
     it("Should revert if not engine", async function () {
       await expect(stakingLP.connect(user1).stakeForEngine(STAKE_AMOUNT))
-        .to.be.revertedWith("StakingLP: Only engine");
+        .to.be.revertedWith("StakingLP: Only engine or deployer");
     });
   });
 

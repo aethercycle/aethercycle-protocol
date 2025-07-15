@@ -47,12 +47,21 @@ describe("Full Protocol Integration", function () {
             3600                             // _cooldownSeconds (1 hour)
         );
 
-        // Now deploy the real AECStakingLP with the correct engine address
+        // Deploy LiquidityDeployer before AECStakingLP
+        const LiquidityDeployer = await ethers.getContractFactory("LiquidityDeployer");
+        const liquidityDeployer = await LiquidityDeployer.deploy(
+            aecToken.target,
+            mockStablecoin.target,
+            mockRouter.target
+        );
+
+        // Now deploy the real AECStakingLP with the correct engine and liquidityDeployer address
         const AECStakingLP = await ethers.getContractFactory("AECStakingLP");
         stakingLP = await AECStakingLP.deploy(
             aecToken.target,                 // _aecToken
             mockLPToken.target,              // _lpToken (AEC/USDC pair)
             perpetualEngine.target,          // _perpetualEngine (correct address)
+            liquidityDeployer.target,        // _liquidityDeployer
             LP_STAKING_ALLOCATION            // _initialAllocation
         );
 
