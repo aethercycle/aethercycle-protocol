@@ -107,7 +107,6 @@ interface IAECStakingLP {
     // ================================================================
     
     function setRewardsDuration(uint256 _rewardsDuration) external;
-    function togglePause() external;
     function emergencyRecoverToken(address token, uint256 amount) external;
     
     // ================================================================
@@ -174,7 +173,6 @@ interface IAECStakingLP {
         uint256 totalRewardsPaid,
         uint256 uniqueStakers
     );
-    function paused() external view returns (bool);
     function totalBaseRewardsDistributed() external view returns (uint256);
     function totalBonusRewardsDistributed() external view returns (uint256);
     

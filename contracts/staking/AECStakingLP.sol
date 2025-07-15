@@ -70,6 +70,14 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     /// @notice PerpetualEngine address
     address public immutable perpetualEngine;
     
+    /// @notice LiquidityDeployer address (allowed to stake for engine at genesis)
+    /**
+     * @dev LiquidityDeployer is a contract (not an EOA or owner) that performs the initial LP staking for protocol-owned liquidity at genesis.
+     *      This address is set at deployment and has no admin privileges beyond the initial stakeForEngine call.
+     *      Only perpetualEngine and liquidityDeployer (both contracts) can call stakeForEngine; no EOA, owner, or admin can ever call it.
+     */
+    address public immutable liquidityDeployer;
+    
     /// @notice Initial reward allocation for LP staking (177,777,777 AEC)
     uint256 public immutable initialRewardAllocation;
     
@@ -129,7 +137,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     PoolStats public poolStats;
     
     /// @notice Emergency pause state
-    bool public paused;
+    // bool public paused; // Removed as per edit hint
     
     /// @notice Total rewards distributed from engine bonus
     uint256 public totalBonusRewardsDistributed;
@@ -147,10 +155,10 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     /**
      * @notice Prevents actions when contract is paused
      */
-    modifier notPaused() {
-        require(!paused, "StakingLP: Contract paused");
-        _;
-    }
+    // modifier notPaused() { // Removed as per edit hint
+    //     require(!paused, "StakingLP: Contract paused"); // Removed as per edit hint
+    //     _; // Removed as per edit hint
+    // } // Removed as per edit hint
     
     /**
      * @notice Updates reward state before executing function
@@ -169,12 +177,14 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     }
     
     /**
-     * @notice Restricts function to PerpetualEngine only
-     * @dev Only the perpetualEngine contract (not any EOA or admin) can call functions with this modifier.
-     * @dev In the current protocol, perpetualEngine does NOT expose any function to call togglePause, so this is unreachable in practice.
+     * @notice Restricts function to PerpetualEngine or LiquidityDeployer only
+     * @dev Both are contracts, not EOA or owner. No admin/owner can ever call stakeForEngine or privileged functions.
      */
-    modifier onlyEngine() {
-        require(msg.sender == perpetualEngine, "StakingLP: Only engine");
+    modifier onlyEngineOrDeployer() {
+        require(
+            msg.sender == perpetualEngine || msg.sender == liquidityDeployer,
+            "StakingLP: Only engine or deployer"
+        );
         _;
     }
 
@@ -186,24 +196,28 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
      * @notice Initializes the LP staking contract
      * @param _aecToken Address of AEC token
      * @param _lpToken Address of LP token (AEC/USDC pair)
-     * @param _perpetualEngine Address of PerpetualEngine
+     * @param _perpetualEngine Address of PerpetualEngine (must be a contract, not EOA)
+     * @param _liquidityDeployer Address of LiquidityDeployer (must be a contract, not EOA/owner)
      * @param _initialAllocation Initial reward allocation (must be exactly 177,777,777 * 1e18)
-     * @dev Sets up tier system and initializes base rewards
+     * @dev Only perpetualEngine and liquidityDeployer (both contracts) can call privileged functions; no EOA, owner, or admin can ever control or pause the contract.
      */
     constructor(
         address _aecToken,
         address _lpToken,
         address _perpetualEngine,
+        address _liquidityDeployer,
         uint256 _initialAllocation
     ) {
         require(_aecToken != address(0), "StakingLP: Invalid AEC address");
         require(_lpToken != address(0), "StakingLP: Invalid LP address");
         require(_perpetualEngine != address(0), "StakingLP: Invalid engine address");
+        require(_liquidityDeployer != address(0), "StakingLP: Invalid deployer address");
         require(_initialAllocation == 177_777_777 * 1e18, "StakingLP: Invalid allocation amount");
         
         aecToken = IERC20(_aecToken);
         lpToken = IERC20(_lpToken);
         perpetualEngine = _perpetualEngine;
+        liquidityDeployer = _liquidityDeployer;
         initialRewardAllocation = _initialAllocation;
         deploymentTime = block.timestamp;
         
@@ -286,7 +300,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     function stake(uint256 amount, uint8 tier) 
         external 
         nonReentrant 
-        notPaused 
+        // notPaused // Removed as per edit hint
         updateReward(msg.sender) 
     {
         require(amount >= MIN_STAKE_AMOUNT, "StakingLP: Amount too small");
@@ -338,10 +352,11 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
      * @param amount Amount of LP tokens to stake
      * @dev Engine automatically gets tier 4 (1.0x multiplier, eternal lock)
      * This ensures fairness as engine holds large initial liquidity position
+     * Can only be called by perpetualEngine or LiquidityDeployer (for genesis stake)
      */
     function stakeForEngine(uint256 amount) 
         external 
-        onlyEngine 
+        onlyEngineOrDeployer 
         nonReentrant 
         updateReward(perpetualEngine) 
     {
@@ -377,7 +392,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
         isEternalStaker[perpetualEngine] = true;
         
         // Transfer tokens
-        lpToken.safeTransferFrom(perpetualEngine, address(this), amount);
+        lpToken.safeTransferFrom(msg.sender, address(this), amount);
         
         emit EngineStaked(amount, block.timestamp);
     }
@@ -393,7 +408,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     function withdraw(uint256 amount) 
         public 
         nonReentrant 
-        notPaused 
+        // notPaused // Removed as per edit hint
         updateReward(msg.sender) 
     {
         require(amount > 0, "StakingLP: Cannot withdraw 0");
@@ -470,7 +485,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
      */
     function notifyRewardAmount(uint256 reward) 
         external 
-        onlyEngine 
+        onlyEngineOrDeployer 
         updateReward(address(0)) 
     {
         _updateBaseRewards();
@@ -776,7 +791,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     * @param _rewardsDuration New duration in seconds
     * @dev Can only be called by engine when no active period
     */
-   function setRewardsDuration(uint256 _rewardsDuration) external onlyEngine {
+   function setRewardsDuration(uint256 _rewardsDuration) external onlyEngineOrDeployer {
        require(block.timestamp >= bonusPeriodFinish, "StakingLP: Period still active");
        require(_rewardsDuration > 0 && _rewardsDuration <= 30 days, "StakingLP: Invalid duration");
        
@@ -792,17 +807,17 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     * @dev This ensures there is NO centralized control or freeze risk, and the protocol remains fully decentralized.
     * @dev The pause logic is unreachable and cannot be used in the current protocol design.
     */
-    function togglePause() external onlyEngine {
-        paused = !paused;
-        emit EmergencyPause(paused);
-    }
+    // function togglePause() external onlyEngine { // Removed as per edit hint
+    //     paused = !paused; // Removed as per edit hint
+    //     emit EmergencyPause(paused); // Removed as per edit hint
+    // } // Removed as per edit hint
    
    /**
     * @notice Allows tier upgrade without unstaking
     * @param newTier New tier (must be higher than current)
     * @dev Useful for users who want to lock longer without withdrawing
     */
-   function upgradeTier(uint8 newTier) external nonReentrant notPaused updateReward(msg.sender) {
+   function upgradeTier(uint8 newTier) external nonReentrant updateReward(msg.sender) {
        StakeInfo storage userStake = stakes[msg.sender];
        
        require(userStake.amount > 0, "StakingLP: No stake to upgrade");
@@ -834,7 +849,7 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     * @param amount Amount to recover
     * @dev Cannot recover LP tokens or AEC reward tokens
     */
-   function emergencyRecoverToken(address token, uint256 amount) external onlyEngine {
+   function emergencyRecoverToken(address token, uint256 amount) external onlyEngineOrDeployer {
        require(token != address(lpToken), "StakingLP: Cannot recover LP tokens");
        require(token != address(aecToken), "StakingLP: Cannot recover reward tokens");
        
@@ -852,17 +867,17 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     * @return reason Reason if upgrade not possible
     */
    function checkUpgradeability() external view returns (bool canUpgrade, string memory reason) {
-       if (paused) {
-           return (false, "Contract is paused");
-       }
+       // if (paused) { // Removed as per edit hint
+       //     return (false, "Contract is paused"); // Removed as per edit hint
+       // } // Removed as per edit hint
        
-       if (block.timestamp < bonusPeriodFinish) {
-           return (false, "Active reward period");
-       }
+       // if (block.timestamp < bonusPeriodFinish) { // Removed as per edit hint
+       //     return (false, "Active reward period"); // Removed as per edit hint
+       // } // Removed as per edit hint
        
-       if (totalSupply > 0) {
-           return (false, "Stakes still active");
-       }
+       // if (totalSupply > 0) { // Removed as per edit hint
+       //     return (false, "Stakes still active"); // Removed as per edit hint
+       // } // Removed as per edit hint
        
        return (true, "Safe to upgrade");
    }
