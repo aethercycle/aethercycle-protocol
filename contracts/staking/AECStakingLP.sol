@@ -170,6 +170,8 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
     
     /**
      * @notice Restricts function to PerpetualEngine only
+     * @dev Only the perpetualEngine contract (not any EOA or admin) can call functions with this modifier.
+     * @dev In the current protocol, perpetualEngine does NOT expose any function to call togglePause, so this is unreachable in practice.
      */
     modifier onlyEngine() {
         require(msg.sender == perpetualEngine, "StakingLP: Only engine");
@@ -783,13 +785,17 @@ contract AECStakingLP is ReentrancyGuard, IAECStakingLP {
    }
    
    /**
-    * @notice Emergency pause toggle
-    * @dev Only engine can pause/unpause for emergency situations
+    * @notice Emergency pause toggle for staking contract
+    * @dev Only callable by the perpetualEngine contract (not by any EOA or admin)
+    * @dev PerpetualEngine is a fully autonomous contract and does NOT expose any function to call togglePause.
+    * @dev As a result, in practice, this pause function cannot be triggered by any entity (including owner, deployer, or governance).
+    * @dev This ensures there is NO centralized control or freeze risk, and the protocol remains fully decentralized.
+    * @dev The pause logic is unreachable and cannot be used in the current protocol design.
     */
-   function togglePause() external onlyEngine {
-       paused = !paused;
-       emit EmergencyPause(paused);
-   }
+    function togglePause() external onlyEngine {
+        paused = !paused;
+        emit EmergencyPause(paused);
+    }
    
    /**
     * @notice Allows tier upgrade without unstaking

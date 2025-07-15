@@ -140,6 +140,9 @@ LP token staking with:
 - **Decay Mechanism**: Sustainable reward distribution
 - **Liquidity Incentives**: Enhanced rewards for protocol liquidity
 
+> **Note on Emergency Pause:**
+> The AECStakingLP contract includes an emergency pause function that is only callable by the `perpetualEngine` contract address. However, the perpetualEngine contract is fully autonomous and does **not** expose any function to call or trigger the pause. As a result, in practice, the pause function is unreachable and cannot be used by any entity (including owner, deployer, admin, or governance). This ensures there is **no centralized control or freeze risk**, and the protocol remains fully decentralized.
+
 ## 💰 Economic Model
 
 ### Revenue Distribution
