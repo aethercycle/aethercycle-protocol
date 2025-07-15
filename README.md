@@ -270,9 +270,11 @@ This is a standard practice in DeFi projects to ensure transparency and maintain
 
 - **Integration Tests:** 9 core contracts (AECToken, PerpetualEngine, PerpetualEndowment, AECStakingLP, AECStakingToken, AECStakingNFT, TokenDistributor, AetheriaNFT, LiquidityDeployer) — **All passing**
 - **Edge Case Tests:** TokenDistributor & LiquidityDeployer — **All passing** (see `test/edge/`)
+- **AECToken Edge/Negative Tests:** Dedicated edge/negative test suite covering transfer/approve edge cases, anti-bot and minimum transfer logic, admin/permissioning lock after renounce, and event emission. All scenarios (including admin lock after renounceContractOwnership) are fully covered and passing. See: `test/edge/AECTokenEdgeCases.test.js`
+- **PerpetualEndowment Edge/Negative Tests:** Dedicated edge/negative test suite covering initialization, double init, release without init, permissioning, event emission, decay logic, infinite sustainability, dust/rounding, and state variable consistency. All advanced scenarios are fully covered and passing. See: `test/edge/PerpetualEndowmentEdgeCases.test.js`
 - **Test Structure:**
   - `test/unit/` — Unit tests per contract
-  - `test/integration/` — Multi-contract integration
+  - `test/integration/` — Multi-contract interaction
   - `test/edge/` — Edge/negative/permission tests
 
 > See test output and details in each folder for up-to-date status.
