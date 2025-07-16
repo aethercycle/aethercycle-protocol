@@ -16,7 +16,7 @@ import "../interfaces/IAECStakingLP.sol";
  * @dev One-time use contract that creates the genesis liquidity pool
  * 
  * Flow:
- * 1. Receives AEC tokens from TokenDistributor (7% = 62,222,222 AEC)
+ * 1. Receives AEC tokens from TokenDistributor (6% = 53,333,333 AEC)
  * 2. Receives USDC from FairLaunch sales
  * 3. Creates AEC/USDC liquidity pair
  * 4. Stakes LP tokens in AECStakingLP on behalf of PerpetualEngine
@@ -29,8 +29,8 @@ contract LiquidityDeployer is ReentrancyGuard {
     // CONSTANTS
     // ================================================================
     
-    /// @notice Expected AEC allocation (7% of total supply)
-    uint256 public constant EXPECTED_AEC_AMOUNT = 62_222_222 * 1e18;
+    /// @notice Expected AEC allocation (6% of total supply)
+    uint256 public constant EXPECTED_AEC_AMOUNT = 53_333_333 * 1e18;
     
     /// @notice Minimum USDC from fair launch to proceed
     uint256 public constant MIN_USDC_AMOUNT = 10_000 * 1e6; // $10K minimum
