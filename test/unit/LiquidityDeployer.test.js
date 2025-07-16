@@ -1,6 +1,11 @@
 const { expect } = require("chai");
 const { ethers } = require("hardhat");
 
+// NOTE: This test mints 62,222,222 AEC (7%) to ensure there is always enough token supply for the contract.
+//       The contract only requires 6% (53,333,333 AEC) as per the latest tokenomics.
+//       There is no assertion in the test that expects exactly 7%, so the test remains valid even if contract logic changes.
+//
+// For extra tidiness, you may update the mint amount to 53,333,333, but functionally it makes no difference.
 describe("LiquidityDeployer", function () {
     let LiquidityDeployer, MockERC20, MockRouter, MockFactory, MockStakingLP;
     let deployer, fairLaunch, perpetualEngine, stakingLP, user, other;
