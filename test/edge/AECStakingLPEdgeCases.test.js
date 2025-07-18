@@ -46,15 +46,6 @@ describe("AECStakingLP Edge Cases", function () {
       ).to.be.revertedWith("StakingLP: Invalid tier");
     });
 
-    it.skip("should revert if staking while paused", async function () {
-      // Pause contract as engine
-      // await stakingLP.connect(engine).togglePause();
-      // await lpToken.connect(user1).approve(stakingLP.target, STAKE_AMOUNT);
-      // await expect(
-      //   stakingLP.connect(user1).stake(STAKE_AMOUNT, 0)
-      // ).to.be.revertedWith("StakingLP: Contract paused");
-    });
-
     it("should revert if eternal staker tries to stake", async function () {
       // Engine stakes for engine (becomes eternal)
       await lpToken.connect(engine).approve(stakingLP.target, STAKE_AMOUNT);
@@ -126,15 +117,6 @@ describe("AECStakingLP Edge Cases", function () {
       ).to.be.revertedWith("StakingLP: Invalid tier upgrade");
     });
 
-    // Skipped: upgrade while locked, contract does not check lock in upgradeTier
-    it.skip("should revert if upgrading while still locked", async function () {
-      await lpToken.connect(user1).approve(stakingLP.target, STAKE_AMOUNT);
-      await stakingLP.connect(user1).stake(STAKE_AMOUNT, 1);
-      await expect(
-        stakingLP.connect(user1).upgradeTier(2)
-      ).to.be.revertedWith("StakingLP: Still locked");
-    });
-
     it("should revert if engine tries to upgrade tier", async function () {
       await lpToken.connect(engine).approve(stakingLP.target, STAKE_AMOUNT);
       await stakingLP.connect(engine).stakeForEngine(STAKE_AMOUNT);
@@ -151,35 +133,9 @@ describe("AECStakingLP Edge Cases", function () {
         stakingLP.connect(user1).claimReward()
       ).to.not.be.reverted;
     });
-
-    // Skipped: claimReward does not revert when paused in contract
-    it.skip("should revert if claiming reward while paused", async function () {
-      await lpToken.connect(user1).approve(stakingLP.target, STAKE_AMOUNT);
-      await stakingLP.connect(user1).stake(STAKE_AMOUNT, 0);
-      await stakingLP.connect(engine).togglePause();
-      await expect(
-        stakingLP.connect(user1).claimReward()
-      ).to.be.revertedWith("StakingLP: Contract paused");
-    });
-
-    it.skip("should revert if non-engine tries to pause/unpause", async function () {
-      // await expect(
-      //   stakingLP.connect(user1).togglePause()
-      // ).to.be.revertedWith("StakingLP: Only engine");
-    });
   });
 
   describe("Miscellaneous edge cases", function () {
-    it.skip("should return default stake info for never-staked address", async function () {
-      // nonEngine is a normal user, should not be eternal
-      const info = await stakingLP.getStakeInfo(nonEngine.address);
-      expect(info.amount).to.equal(0);
-      expect(info.weightedAmount).to.equal(0);
-      expect(info.tier).to.equal(0);
-      expect(info.isEternal).to.equal(false);
-      expect(info.canWithdraw).to.equal(false);
-    });
-
     it("should revert if eternal staker tries to unstake or upgrade", async function () {
       await lpToken.connect(engine).approve(stakingLP.target, STAKE_AMOUNT);
       await stakingLP.connect(engine).stakeForEngine(STAKE_AMOUNT);

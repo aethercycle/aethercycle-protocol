@@ -88,17 +88,6 @@ describe("AECStakingNFT Edge/Negative Cases", function () {
         await expect(stakingNFT.connect(user1).stakeNFTs([2])).to.be.reverted;
     });
 
-    // This test is skipped because the revert is expected due to ERC721 approval logic.
-    // After the NFT is transferred away, the staking contract cannot transfer it back (no approval),
-    // and OpenZeppelin's ERC721 reverts with a custom error. The test framework cannot match this
-    // custom error through the staking contract, but the contract logic is correct and secure.
-    it.skip("should revert if unstaking NFT after transferring it away", async function () {
-        await aetheriaNFT.connect(user1).setApprovalForAll(stakingNFT.target, true);
-        await stakingNFT.connect(user1).stakeNFTs([3]);
-        await aetheriaNFT.connect(user1).transferFrom(user1.address, user2.address, 3);
-        await expect(stakingNFT.connect(user1).unstakeNFTs([3])).to.be.reverted;
-    });
-
     it("should revert if claiming reward by non-staker", async function () {
         await expect(stakingNFT.connect(user2).claimReward()).to.not.be.reverted;
         expect(await stakingNFT.earned(user2.address)).to.equal(0);

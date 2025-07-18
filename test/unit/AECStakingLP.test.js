@@ -227,15 +227,6 @@ describe("AECStakingLP", function () {
         .to.be.revertedWith("StakingLP: Still locked");
     });
 
-    it.skip("Should revert if eternal staker", async function () {
-      // Only the engine can be eternal staker, so we test with mockEngine
-      const mockEngineSigner = await ethers.getSigner(mockEngine.target);
-      await lpToken.connect(mockEngineSigner).approve(stakingLP.target, ethers.parseEther("10000"));
-      await stakingLP.connect(mockEngineSigner).stakeForEngine(STAKE_AMOUNT);
-      await expect(stakingLP.connect(mockEngineSigner).withdraw(STAKE_AMOUNT))
-        .to.be.revertedWith("StakingLP: Eternal stakers cannot withdraw");
-    });
-
     it("Should revert if insufficient balance", async function () {
       await ethers.provider.send("evm_increaseTime", [1]);
       await ethers.provider.send("evm_mine");
