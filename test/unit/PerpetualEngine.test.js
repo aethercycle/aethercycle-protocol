@@ -774,3 +774,4 @@ describe("PerpetualEngine - Utility/View Functions", function () {
     await engine.getEndowmentStats(); // just call, no assert (mock)
   });
 }); 
+}); 
