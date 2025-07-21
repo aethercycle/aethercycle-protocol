@@ -124,6 +124,75 @@ describe("PerpetualEndowment", function () {
       expect(balanceAfter).to.be.gt(balanceBefore);
       expect(endowmentBalanceAfter).to.be.lt(endowmentBalanceBefore);
     });
+
+    it("Should release funds using simple interest calculation when compounding is disabled", async function () {
+      // Impersonate engine to disable compounding
+      await owner.sendTransaction({ to: mockEngine.target, value: ethers.parseEther("1.0") });
+      const mockEngineSigner = await ethers.getImpersonatedSigner(mockEngine.target);
+      await endowment.connect(mockEngineSigner).setCompoundingEnabled(false);
+      expect(await endowment.compoundingEnabled()).to.equal(false);
+
+      // Advance time by 31 days
+      await ethers.provider.send("evm_increaseTime", [31 * 24 * 3600]);
+      await ethers.provider.send("evm_mine");
+
+      const balanceBefore = await aecToken.balanceOf(endowment.target);
+      // Expected release is 0.5% of the current balance
+      const expectedRelease = (balanceBefore * BigInt(50)) / BigInt(10000);
+
+      // Act & Assert
+      await expect(endowment.connect(mockEngineSigner).releaseFunds())
+        .to.emit(endowment, "FundsReleased")
+        .withArgs(expectedRelease, 1, balanceBefore - expectedRelease);
+    });
+
+    it("Should cap the release periods to MAX_PERIODS_PER_RELEASE", async function () {
+      // Advance time by 7 months (which is > MAX_PERIODS_PER_RELEASE)
+      const sevenMonths = 7 * 30 * 24 * 3600;
+      await ethers.provider.send("evm_increaseTime", [sevenMonths]);
+      await ethers.provider.send("evm_mine");
+
+      // Impersonate engine to call releaseFunds
+      await owner.sendTransaction({ to: mockEngine.target, value: ethers.parseEther("1.0") });
+      const mockEngineSigner = await ethers.getImpersonatedSigner(mockEngine.target);
+      
+      const MAX_PERIODS_PER_RELEASE = await endowment.MAX_PERIODS_PER_RELEASE();
+      
+      // Act & Assert
+      // The event should show that only MAX_PERIODS_PER_RELEASE (6) periods were processed
+      await expect(endowment.connect(mockEngineSigner).releaseFunds())
+        .to.emit(endowment, "FundsReleased")
+        .withArgs(
+          (releaseAmount) => releaseAmount > 0, // We just check if some amount was released
+          MAX_PERIODS_PER_RELEASE,               // Assert that periods processed is capped
+          (remainingBalance) => remainingBalance > 0 // We just check if some balance remains
+        );
+    });
+  });
+
+  describe("View Functions & Suggestions", function() {
+    beforeEach(async function () {
+      await aecToken.transfer(endowment.target, INITIAL_ENDOWMENT);
+      await endowment.initialize();
+    });
+
+    it("should suggest not to release when no period has passed", async function() {
+      const [shouldRelease, potentialAmount, periodsWaiting] = await endowment.suggestOptimalRelease.staticCall({ gasPrice: 1 });
+      expect(shouldRelease).to.be.false;
+      expect(potentialAmount).to.equal(0);
+      expect(periodsWaiting).to.equal(0);
+    });
+
+    it("should suggest to release when a period has passed", async function() {
+      // Advance time by 31 days
+      await ethers.provider.send("evm_increaseTime", [31 * 24 * 3600]);
+      await ethers.provider.send("evm_mine");
+
+      const [shouldRelease, potentialAmount, periodsWaiting] = await endowment.suggestOptimalRelease.staticCall({ gasPrice: 1 });
+      expect(shouldRelease).to.be.true;
+      expect(potentialAmount).to.be.gt(0);
+      expect(periodsWaiting).to.equal(1);
+    });
   });
 
   describe("Configuration Functions", function () {
