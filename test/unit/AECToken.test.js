@@ -133,6 +133,28 @@ describe("AECToken", function () {
             expect(taxCollected).to.equal(expectedTax);
         });
 
+        it("Should apply unofficial tax rates for contract-to-contract transfers (non-AMM)", async function () {
+            /**
+             * This test verifies that when both the sender and recipient are contracts (and neither is an AMM),
+             * the unofficial tax rate is applied to the transfer.
+             */
+            // Deploy two mock contracts
+            const MockContract = await ethers.getContractFactory("MockContract");
+            const mockSender = await MockContract.deploy();
+            const mockRecipient = await MockContract.deploy();
+            // Transfer AEC to mockSender contract
+            await aecToken.connect(tokenDistributor).transfer(mockSender.getAddress(), ethers.parseEther("1000"));
+            const transferAmount = ethers.parseEther("1000");
+            const initialContractBalance = await aecToken.balanceOf(await aecToken.getAddress());
+            // From mockSender, transfer to mockRecipient
+            await mockSender.transferFromAECToken(aecToken.getAddress(), mockRecipient.getAddress(), transferAmount);
+            const finalContractBalance = await aecToken.balanceOf(await aecToken.getAddress());
+            const taxCollected = finalContractBalance - initialContractBalance;
+            // Should collect 10% tax (unofficial buy tax)
+            const expectedTax = (transferAmount * BigInt(UNOFFICIAL_BUY_TAX_BPS)) / BigInt(10000);
+            expect(taxCollected).to.equal(expectedTax);
+        });
+
         it("Should prevent dust attacks", async function () {
             const dustAmount = ethers.parseEther("0.0001"); // Below MIN_TRANSFER_AMOUNT
             
@@ -149,6 +171,19 @@ describe("AECToken", function () {
             await expect(aecToken.connect(addr1).transfer(user1.address, transferAmount))
                 .to.emit(aecToken, "TaxCollected")
                 .withArgs(addr1.address, user1.address, anyValue, true, INITIAL_BUY_TAX_BPS);
+        });
+
+        it("Should revert with correct message if transfer amount is below MIN_TRANSFER_AMOUNT (explicit)", async function () {
+            /**
+             * This test explicitly verifies that if the transfer amount is below the minimum transfer threshold (0.001 AEC),
+             * the transaction reverts with the expected error message.
+             */
+            await aecToken.connect(owner).setAmmPair(addr1.address, true);
+            // Use an amount just below the minimum transfer threshold
+            const belowMinAmount = ethers.parseUnits("0.000000000000000999", 18); // 0.000000000000000999 AEC
+            await expect(
+                aecToken.connect(addr1).transfer(user1.address, belowMinAmount)
+            ).to.be.revertedWith("AEC: Transfer amount too small");
         });
     });
 
@@ -344,6 +379,83 @@ describe("AECToken", function () {
                     value: ethers.parseEther("1")
                 })
             ).to.be.revertedWith("AEC: This contract does not accept Ether");
+        });
+    });
+
+    describe("Additional Security and Configuration Scenarios", function () {
+        it("Should tax address after tax exclusion is revoked", async function () {
+            // Exclude user1 from tax, then revoke exclusion and verify tax is applied
+            await aecToken.connect(owner).setTaxExclusion(user1.address, true);
+            expect(await aecToken.isExcludedFromTax(user1.address)).to.be.true;
+            await aecToken.connect(owner).setTaxExclusion(user1.address, false);
+            expect(await aecToken.isExcludedFromTax(user1.address)).to.be.false;
+            // Set AMM pair for testing
+            await aecToken.connect(owner).setAmmPair(addr1.address, true);
+            // Transfer tokens to addr1 (AMM)
+            await aecToken.connect(tokenDistributor).transfer(addr1.address, ethers.parseEther("1000"));
+            // Transfer from addr1 (AMM) to user1 (now not excluded), should apply tax
+            const transferAmount = ethers.parseEther("1000");
+            const initialContractBalance = await aecToken.balanceOf(await aecToken.getAddress());
+            await aecToken.connect(addr1).transfer(user1.address, transferAmount);
+            const finalContractBalance = await aecToken.balanceOf(await aecToken.getAddress());
+            expect(finalContractBalance).to.be.gt(initialContractBalance);
+        });
+
+        it("Should not consider address as AMM after setAmmPair(pair, false)", async function () {
+            await aecToken.connect(owner).setAmmPair(addr1.address, true);
+            expect(await aecToken.automatedMarketMakerPairs(addr1.address)).to.be.true;
+            await aecToken.connect(owner).setAmmPair(addr1.address, false);
+            expect(await aecToken.automatedMarketMakerPairs(addr1.address)).to.be.false;
+        });
+
+        it("Should revert when setting tax exclusion for zero address", async function () {
+            await expect(
+                aecToken.connect(owner).setTaxExclusion(ethers.ZeroAddress, true)
+            ).to.be.revertedWith("AEC: Account cannot be zero");
+        });
+
+        it("Should revert when rescuing tokens from zero address", async function () {
+            await expect(
+                aecToken.connect(owner).rescueForeignTokens(ethers.ZeroAddress)
+            ).to.be.revertedWith("AEC: Token address cannot be zero");
+        });
+
+        it("Should revert approveEngineForProcessing if perpetualEngineAddress is not set", async function () {
+            // Transfer some tokens to contract to simulate collected tax
+            await aecToken.connect(tokenDistributor).transfer(await aecToken.getAddress(), ethers.parseEther("1000"));
+            await expect(
+                aecToken.approveEngineForProcessing()
+            ).to.be.revertedWith("AEC: PerpetualEngine address not set");
+        });
+
+        it("Should return correct contract state after tax is collected and engine is set", async function () {
+            // Set perpetual engine address
+            await aecToken.connect(owner).setPerpetualEngineAddress(perpetualEngine.address);
+            // Transfer some tokens to contract to simulate collected tax
+            await aecToken.connect(tokenDistributor).transfer(await aecToken.getAddress(), ethers.parseEther("1000"));
+            const state = await aecToken.getContractState();
+            expect(state.collectedTax).to.equal(ethers.parseEther("1000"));
+            expect(state.engineSet).to.be.true;
+        });
+
+        it("Should revert all onlyOwner/onlyBeforeRenounce functions after renounceOwnership", async function () {
+            await aecToken.connect(owner).renounceContractOwnership();
+            // Try to call all onlyOwner/onlyBeforeRenounce functions and ensure they revert (regardless of message)
+            await expect(
+                aecToken.connect(owner).setPerpetualEngineAddress(addr1.address)
+            ).to.be.reverted;
+            await expect(
+                aecToken.connect(owner).setPrimaryAmmPair(addr1.address)
+            ).to.be.reverted;
+            await expect(
+                aecToken.connect(owner).setTaxExclusion(user1.address, true)
+            ).to.be.reverted;
+            await expect(
+                aecToken.connect(owner).setAmmPair(addr1.address, true)
+            ).to.be.reverted;
+            await expect(
+                aecToken.connect(owner).rescueForeignTokens(addr1.address)
+            ).to.be.reverted;
         });
     });
 });
