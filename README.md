@@ -17,7 +17,6 @@ replacing human promises with mathematical certainty. Once deployed, the protoco
 - **Total Supply:** 888,888,888 AEC
 - **Smart Contracts:** 15+
 - **Test Coverage:** 500+ tests passing
-- **Gas Optimized:** ~37k gas for transfers
 
 ## 🏗️ Architecture
 AetherCycle Protocol
@@ -79,7 +78,8 @@ npx hardhat test test/integration/
 npx hardhat test test/edge/
 
 # Gas reporting
-REPORT_GAS=true npx hardhat test
+// Removed gas reporting instructions as gas analysis is not needed for base network
+
 📁 Project Structure
 contracts/
 ├── core/         # Foundation contracts

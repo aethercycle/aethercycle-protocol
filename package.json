@@ -2,7 +2,12 @@
   "name": "aethercycle-protocol",
   "version": "1.0.0",
   "description": "Autonomous DeFi Protocol with Perpetual Economic Engine",
-  "keywords": ["defi", "autonomous", "aethercycle", "perpetual-engine"],
+  "keywords": [
+    "defi",
+    "autonomous",
+    "aethercycle",
+    "perpetual-engine"
+  ],
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
@@ -17,13 +22,12 @@
     "@nomicfoundation/hardhat-toolbox": "^4.0.0",
     "@nomicfoundation/hardhat-verify": "^2.0.0",
     "hardhat": "^2.19.0",
-    "hardhat-gas-reporter": "^1.0.9",
     "hardhat-contract-sizer": "^2.10.0",
     "solidity-coverage": "^0.8.5"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^5.0.0",
     "@chainlink/contracts": "^0.8.0",
+    "@openzeppelin/contracts": "^5.0.0",
     "dotenv": "^16.3.0"
   }
 }
