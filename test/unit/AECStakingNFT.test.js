@@ -198,23 +198,16 @@ describe("AECStakingNFT", function () {
             
             const initialLastUpdate = await stakingNFT.lastBaseRewardUpdate();
             const decayPeriod = await stakingNFT.DECAY_PERIOD();
-            console.log("Initial lastBaseRewardUpdate:", initialLastUpdate.toString());
-            console.log("DECAY_PERIOD:", decayPeriod.toString());
             
             // First decay cycle
             await time.increase(31 * 24 * 60 * 60);
-            const timeAfterIncrease = await time.latest();
-            console.log("Time after 31 days:", timeAfterIncrease.toString());
-            console.log("Time difference:", (Number(timeAfterIncrease) - Number(initialLastUpdate)).toString());
             
             await stakingNFT.connect(user1).claimReward();
             const lastUpdateAfterClaim = await stakingNFT.lastBaseRewardUpdate();
-            console.log("lastBaseRewardUpdate after claim:", lastUpdateAfterClaim.toString());
             
             // Add bonus reward to ensure rewardPerNFT is updated
             await stakingNFT.connect(perpetualEngine).notifyRewardAmount(ethers.parseEther("1000"));
             const rewardPerNFT = await stakingNFT.rewardPerNFT();
-            console.log("rewardPerNFT after bonus:", rewardPerNFT.toString());
             expect(rewardPerNFT).to.be.gt(0);
         });
 
@@ -256,9 +249,6 @@ describe("AECStakingNFT", function () {
             const baseRate = await stakingNFT.calculateBaseRewardRatePublic();
             const rewardPerNFT = await stakingNFT.rewardPerNFT();
             const earned = await stakingNFT.earned(user1.address);
-            console.log("baseRate:", baseRate.toString());
-            console.log("rewardPerNFT:", rewardPerNFT.toString());
-            console.log("earned(user1):", earned.toString());
         });
     });
 
@@ -337,8 +327,6 @@ describe("AECStakingNFT", function () {
             await time.increase(730 * 24 * 60 * 60);
             await stakingNFT.connect(user1).claimReward();
             const remainingRewards = await stakingNFT.remainingBaseRewards();
-            console.log("initialRewards:", initialRewards.toString());
-            console.log("remainingRewards after 2 years:", remainingRewards.toString());
             expect(remainingRewards).to.be.lt(initialRewards);
         });
 
@@ -441,67 +429,42 @@ describe("AECStakingNFT", function () {
             const tokenIds = Array.from({length: 100}, (_, i) => i + 100);
             await stakingNFT.connect(user1).stakeNFTs(tokenIds);
             
-            console.log("=== Initial State ===");
-            console.log("Total NFTs staked:", (await stakingNFT.totalNFTsStaked()).toString());
-            console.log("Remaining base rewards:", ethers.formatEther(await stakingNFT.remainingBaseRewards()), "AEC");
-            
             // Advance time by 1 day
             await time.increase(24 * 60 * 60);
-            console.log("\n=== After 1 day ===");
             const baseRate1 = await stakingNFT.calculateBaseRewardRatePublic();
             const rewardPerNFT1 = await stakingNFT.rewardPerNFT();
             const earned1 = await stakingNFT.earned(user1.address);
-            console.log("Base rate:", ethers.formatEther(baseRate1), "AEC per second");
-            console.log("Reward per NFT:", ethers.formatEther(rewardPerNFT1), "AEC");
-            console.log("Earned rewards:", ethers.formatEther(earned1), "AEC");
             
             // Add small bonus reward to trigger rewardPerNFT update
             await stakingNFT.connect(perpetualEngine).notifyRewardAmount(ethers.parseEther("100"));
             
             // Advance time by 7 days
             await time.increase(6 * 24 * 60 * 60);
-            console.log("\n=== After 7 days total ===");
             const baseRate7 = await stakingNFT.calculateBaseRewardRatePublic();
             const rewardPerNFT7 = await stakingNFT.rewardPerNFT();
             const earned7 = await stakingNFT.earned(user1.address);
-            console.log("Base rate:", ethers.formatEther(baseRate7), "AEC per second");
-            console.log("Reward per NFT:", ethers.formatEther(rewardPerNFT7), "AEC");
-            console.log("Earned rewards:", ethers.formatEther(earned7), "AEC");
             
             // Advance time by 30 days (trigger decay)
             await time.increase(23 * 24 * 60 * 60);
-            console.log("\n=== After 30 days total (decay triggered) ===");
             await stakingNFT.connect(user1).claimReward(); // Trigger decay
             const baseRate30 = await stakingNFT.calculateBaseRewardRatePublic();
             const rewardPerNFT30 = await stakingNFT.rewardPerNFT();
             const earned30 = await stakingNFT.earned(user1.address);
-            console.log("Base rate:", ethers.formatEther(baseRate30), "AEC per second");
-            console.log("Reward per NFT:", ethers.formatEther(rewardPerNFT30), "AEC");
-            console.log("Earned rewards:", ethers.formatEther(earned30), "AEC");
-            console.log("Remaining base rewards:", ethers.formatEther(await stakingNFT.remainingBaseRewards()), "AEC");
             
             // Add another bonus reward to trigger rewardPerNFT update
             await stakingNFT.connect(perpetualEngine).notifyRewardAmount(ethers.parseEther("1000"));
             
             // Advance time by another 30 days
             await time.increase(30 * 24 * 60 * 60);
-            console.log("\n=== After 60 days total ===");
             const baseRate60 = await stakingNFT.calculateBaseRewardRatePublic();
             const rewardPerNFT60 = await stakingNFT.rewardPerNFT();
             const earned60 = await stakingNFT.earned(user1.address);
-            console.log("Base rate:", ethers.formatEther(baseRate60), "AEC per second");
-            console.log("Reward per NFT:", ethers.formatEther(rewardPerNFT60), "AEC");
-            console.log("Earned rewards:", ethers.formatEther(earned60), "AEC");
             
             // Claim rewards and see actual payout
             const balanceBefore = await aecToken.balanceOf(user1.address);
             await stakingNFT.connect(user1).claimReward();
             const balanceAfter = await aecToken.balanceOf(user1.address);
             const actualPayout = balanceAfter - balanceBefore;
-            
-            console.log("\n=== Final Results ===");
-            console.log("Actual payout:", ethers.formatEther(actualPayout), "AEC");
-            console.log("Rewards per NFT per day:", ethers.formatEther(actualPayout / 100n / 60n), "AEC");
             
             // Verify that rewards are reasonable (not zero, not excessive)
             expect(actualPayout).to.be.gt(0);

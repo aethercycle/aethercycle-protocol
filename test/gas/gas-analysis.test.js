@@ -38,16 +38,13 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
             // Transfer gas
             const transferTx = await aecToken.transfer(user1.address, amount);
             const transferReceipt = await transferTx.wait();
-            console.log(`📤 Transfer: ${transferReceipt.gasUsed.toLocaleString()} gas`);
             // Approve gas
             const approveTx = await aecToken.approve(user1.address, amount);
             const approveReceipt = await approveTx.wait();
-            console.log(`✅ Approve: ${approveReceipt.gasUsed.toLocaleString()} gas`);
             // TransferFrom gas
             await aecToken.connect(user1).approve(user2.address, amount);
             const transferFromTx = await aecToken.connect(user2).transferFrom(user1.address, user3.address, amount);
             const transferFromReceipt = await transferFromTx.wait();
-            console.log(`🔄 TransferFrom: ${transferFromReceipt.gasUsed.toLocaleString()} gas`);
             // Verify gas costs are reasonable
             expect(transferReceipt.gasUsed).to.be.lessThan(100000); // Should be ~65k gas
             expect(approveReceipt.gasUsed).to.be.lessThan(50000);   // Should be ~46k gas
@@ -59,7 +56,6 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
             // Burn gas
             const burnTx = await aecToken.burn(amount);
             const burnReceipt = await burnTx.wait();
-            console.log(`🔥 Burn: ${burnReceipt.gasUsed.toLocaleString()} gas`);
             // Verify gas costs
             expect(burnReceipt.gasUsed).to.be.lessThan(100000);
         });
@@ -69,9 +65,6 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
             const balance = await aecToken.balanceOf(owner.address);
             const totalSupply = await aecToken.totalSupply();
             const allowance = await aecToken.allowance(owner.address, user1.address);
-            console.log(`📊 Balance: ${balance}`);
-            console.log(`📊 Total Supply: ${totalSupply}`);
-            console.log(`📊 Allowance: ${allowance}`);
             // View functions don't cost gas
             expect(totalSupply).to.equal(TOTAL_SUPPLY);
             expect(allowance).to.equal(0);
@@ -88,7 +81,6 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
             // Set AEC token address
             const setTokenTx = await distributor.setAECTokenAddress(aecToken.target);
             const setTokenReceipt = await setTokenTx.wait();
-            console.log(`🔗 Set Token Address: ${setTokenReceipt.gasUsed.toLocaleString()} gas`);
             // Set recipients
             const setRecipientsTx = await distributor.setRecipients(
                 user1.address, user2.address, user3.address,
@@ -97,7 +89,6 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
                 user1.address, user1.address
             );
             const setRecipientsReceipt = await setRecipientsTx.wait();
-            console.log(`🎯 Set Recipients: ${setRecipientsReceipt.gasUsed.toLocaleString()} gas`);
             // Relaxed gas assertions
             expect(setTokenReceipt.gasUsed).to.be.lessThan(350000);
             expect(setRecipientsReceipt.gasUsed).to.be.lessThan(350000);
@@ -115,13 +106,12 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
             // Distribute (most expensive operation!)
             const distributeTx = await distributor.distribute();
             const distributeReceipt = await distributeTx.wait();
-            console.log(`🚀 Distribute: ${distributeReceipt.gasUsed.toLocaleString()} gas`);
             // Calculate cost at different gas prices
             const gasPrices = [10, 20, 50, 100]; // gwei
             gasPrices.forEach(price => {
                 const ethCost = ethers.formatEther(distributeReceipt.gasUsed * BigInt(price) * 1_000_000_000n);
                 const usdCost = parseFloat(ethCost) * 2000; // Assuming $2000/ETH
-                console.log(`💰 At ${price} gwei: ${ethCost} ETH ($${usdCost.toFixed(2)})`);
+                // Removed noisy console.log
             });
             // This should be a significant operation (but very efficient!)
             expect(distributeReceipt.gasUsed).to.be.greaterThan(300000);
@@ -130,15 +120,7 @@ describe("Gas Analysis - AetherCycle Protocol", function () {
 
     describe("Gas Optimization Summary", function () {
         it("Should provide optimization recommendations", function () {
-            console.log("\n🎯 GAS OPTIMIZATION RECOMMENDATIONS:");
-            console.log("1. AEC Token transfers are standard ERC20 - no optimization needed");
-            console.log("2. TokenDistributor.distribute() is expensive - consider batching");
-            console.log("3. Use gas-efficient patterns: batch operations, avoid loops");
-            console.log("4. Consider using events instead of storage for some data");
-            console.log("5. Optimize storage layout to reduce SSTORE operations");
-            console.log("6. AEC Token has good gas optimization already");
-            console.log("7. TokenDistributor is one-time use, so high gas is acceptable");
-            // This test always passes - it's just for documentation
+            // Removed all console.log documentation output
             expect(true).to.be.true;
         });
     });

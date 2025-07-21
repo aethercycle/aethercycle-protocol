@@ -37,14 +37,6 @@ describe("LiquidityDeployer", function () {
         router = await MockRouter.deploy(getAddress(factory), getAddress(lpToken));
         staking = await MockStakingLP.deploy();
 
-        // Debug: print all contract addresses
-        console.log("aecToken:", getAddress(aecToken));
-        console.log("usdcToken:", getAddress(usdcToken));
-        console.log("lpToken:", getAddress(lpToken));
-        console.log("factory:", getAddress(factory));
-        console.log("router:", getAddress(router));
-        console.log("staking:", getAddress(staking));
-
         LiquidityDeployer = await ethers.getContractFactory("LiquidityDeployer");
         liquidityDeployer = await LiquidityDeployer.deploy(
             getAddress(aecToken),

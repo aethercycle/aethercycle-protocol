@@ -74,15 +74,10 @@ describe("Full Protocol Integration", function () {
         );
 
         // Test basic functionality of PerpetualEngine
-        console.log("PerpetualEngine deployed at:", perpetualEngine.target);
-        console.log("PerpetualEngine address is valid:", perpetualEngine.target !== "0x0000000000000000000000000000000000000000");
-        
         // Try to call a simple view function to verify deployment
         try {
             const version = await perpetualEngine.version();
-            console.log("PerpetualEngine version:", version);
         } catch (error) {
-            console.log("Error calling version():", error.message);
         }
 
         // Deploy mock NFT
@@ -110,14 +105,6 @@ describe("Full Protocol Integration", function () {
         );
         
         // Now log all contract addresses after deployment
-        console.log("All contracts deployed successfully!");
-        console.log("AECToken:", aecToken.target);
-        console.log("PerpetualEngine:", perpetualEngine.target);
-        console.log("PerpetualEndowment:", perpetualEndowment.target);
-        console.log("AECStakingLP:", stakingLP.target);
-        console.log("AECStakingNFT:", stakingNFT.target);
-        console.log("AECStakingToken:", stakingToken.target);
-        
         // Fund users with AEC tokens (owner has all tokens initially)
         await aecToken.transfer(user1.address, ethers.parseEther("10000"));
         await aecToken.transfer(user2.address, ethers.parseEther("10000"));
@@ -253,9 +240,6 @@ describe("Full Protocol Integration", function () {
             // Higher tiers should have more rewards (due to multipliers)
             // Note: The actual reward distribution depends on the staking duration and multipliers
             // For this test, we'll just verify they all have rewards
-            console.log("User1 rewards (Flexible):", ethers.formatEther(user1Rewards));
-            console.log("User2 rewards (Monthly):", ethers.formatEther(user2Rewards));
-            console.log("User3 rewards (Quarterly):", ethers.formatEther(user3Rewards));
         });
 
         it("Should allow users to claim rewards", async function () {

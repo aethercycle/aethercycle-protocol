@@ -3,7 +3,7 @@ const { ethers } = require("hardhat");
 
 describe("Engine-Endowment 500 Years Sustainability", function () {
   it("should prove endowment never runs out after 500 years", async function () {
-    this.timeout(300000); // 5 minutes
+    this.timeout(180000); // 3 minutes
     const [owner, _] = await ethers.getSigners();
 
     // Deploy AECToken
@@ -61,7 +61,7 @@ describe("Engine-Endowment 500 Years Sustainability", function () {
     let successfulMonths = 0;
     const printFirstN = 10;
     const printLastN = 10;
-    let logs = [];
+    // let logs = []; // Removed logs array
     for (let i = 0; i < 6000; i++) {
       // Advance time by 31 days
       await ethers.provider.send("evm_increaseTime", [31 * 24 * 3600]);
@@ -96,40 +96,22 @@ describe("Engine-Endowment 500 Years Sustainability", function () {
       // Balances after release
       const endowmentBalanceAfter = await aecToken.balanceOf(endowment.target);
       const mockEngineBalanceAfter = await aecToken.balanceOf(mockEngine.target);
-      // Print only for first and last N months
-      if (i < printFirstN || i >= 6000 - printLastN) {
-        if (ethers.formatEther) {
-          logs.push(`Month ${i+1}: block.timestamp = ${block.timestamp}`);
-          logs.push(`           Endowment Balance: ${ethers.formatEther(endowmentBalanceAfter)}`);
-          logs.push(`           MockEngine Balance: ${ethers.formatEther(mockEngineBalanceAfter)}`);
-          logs.push(`           Released (event): ${ethers.formatEther(released)}`);
-        } else {
-          logs.push(`Month ${i+1}: block.timestamp = ${block.timestamp}`);
-          logs.push(`           Endowment Balance: ${endowmentBalanceAfter.toString()}`);
-          logs.push(`           MockEngine Balance: ${mockEngineBalanceAfter.toString()}`);
-          logs.push(`           Released (event): ${released.toString()}`);
-        }
-      }
+      
+      // Removed all logging logic to reduce noise
+      
       if (released > 0n) {
         totalReleased += released;
         successfulMonths++;
       }
     }
-    logs.forEach(l => console.log(l));
+    // logs.forEach(l => console.log(l)); // Removed log printing
+    
     // Print final summary
     const endowmentFinalBalance = await aecToken.balanceOf(endowment.target);
     const mockEngineTotalReceived = await mockEngine.totalReceived();
-    if (ethers.formatEther) {
-      console.log("\n==== FINAL SUMMARY ====");
-      console.log("Total successful release months:", successfulMonths);
-      console.log("Total AEC received by engine:", ethers.formatEther(mockEngineTotalReceived));
-      console.log("Endowment remaining balance:", ethers.formatEther(endowmentFinalBalance));
-    } else {
-      console.log("\n==== FINAL SUMMARY ====");
-      console.log("Total successful release months:", successfulMonths);
-      console.log("Total AEC received by engine:", mockEngineTotalReceived.toString());
-      console.log("Endowment remaining balance:", endowmentFinalBalance.toString());
-    }
+    
+    // Removed all final summary console.log statements
+    
     // Stop impersonating
     await ethers.provider.send("hardhat_stopImpersonatingAccount", [mockEngine.target]);
   });

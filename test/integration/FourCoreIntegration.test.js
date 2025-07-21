@@ -21,16 +21,7 @@ describe("Simple Integration Test", function () {
         mockPair = await MockUniswapPair.deploy();
 
         const MockTokenDistributor = await ethers.getContractFactory("MockContract");
-        console.log('MockTokenDistributor factory created');
         tokenDistributor = await MockTokenDistributor.deploy();
-        console.log('tokenDistributor deployed:', tokenDistributor);
-        console.log('tokenDistributor.target:', tokenDistributor.target);
-
-        // Debug: Check all addresses before deployment
-        console.log('Debug addresses:');
-        console.log('owner.address:', owner.address);
-        console.log('tokenDistributor.target:', tokenDistributor.target);
-        console.log('aecToken (before deploy):', aecToken);
 
         // Deploy AECToken
         const AECToken = await ethers.getContractFactory("AECToken");

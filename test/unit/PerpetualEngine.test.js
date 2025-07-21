@@ -772,6 +772,6 @@ describe("PerpetualEngine - Utility/View Functions", function () {
       aecToken.target, mockUSDC.target, mockRouter.target, aecStakingLP.target, perpetualEndowment.target, owner.address, 100, ethers.parseEther("1000"), 3600
     );
     await engine.getEndowmentStats(); // just call, no assert (mock)
+    });
   });
-}); 
 }); 
