@@ -2,6 +2,7 @@
   "name": "aethercycle-protocol",
   "version": "1.0.0",
   "description": "Autonomous DeFi Protocol with Perpetual Economic Engine",
+  "license": "AGPL-3.0",
   "keywords": [
     "defi",
     "autonomous",

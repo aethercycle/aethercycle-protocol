@@ -1,4 +1,13 @@
-// SPDX-License-Identifier: MIT
+// SPDX-License-Identifier: AGPL-3.0
+/*
+ * @title AetherCycle Protocol - Original Implementation
+ * @author Fukuhi (@aethercycle)
+ * @notice This is the ORIGINAL AetherCycle Protocol implementation.
+ *         Any forks must prominently display "Forked from AetherCycle Protocol by Fukuhi"
+ *         and maintain attribution to the original author and protocol.
+ * @dev This is the canonical implementation of the AetherCycle Protocol.
+ *      Forks must include clear attribution and cannot claim to be the original.
+ */
 pragma solidity ^0.8.20;
 
 import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
@@ -25,13 +34,6 @@ import "../interfaces/IAECToken.sol";
  * - Immutable core parameters for full decentralization
  * - Comprehensive event logging for transparency
  * - Dust attack prevention for regular transfers
- * 
- * FIXES APPLIED:
- * ✅ Fixed constructor deployment issue
- * ✅ Fixed contract detection logic
- * ✅ Removed impossible tax amount checks
- * ✅ Added proper edge case handling
- * ✅ Enhanced precision for tax calculations
  */
 contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
     using SafeERC20 for IERC20;
