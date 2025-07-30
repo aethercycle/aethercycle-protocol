@@ -7,7 +7,7 @@ describe("AECToken", function () {
     let addr1, addr2, addr3, addr4, addr5;
     
     const INITIAL_SUPPLY = ethers.parseEther("888888888"); // 888,888,888 AEC
-    const LAUNCH_TAX_DURATION = 24 * 60 * 60; // 24 hours in seconds
+    const LAUNCH_TAX_DURATION = 5 * 24 * 60 * 60; // 5 days in seconds
     
     // Tax rates in basis points
     const INITIAL_BUY_TAX_BPS = 400;  // 4%

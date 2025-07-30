@@ -45,10 +45,10 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
     // Events are defined in IAECToken interface
 
     // --- Constants ---
-    /// @notice The initial buy tax rate (basis points, 1% = 100) for the first 24 hours after launch.
+    /// @notice The initial buy tax rate (basis points, 1% = 100) for the first 5 days after launch.
     uint16 public constant INITIAL_BUY_TAX_BPS = 400;  // 4%
     
-    /// @notice The initial sell tax rate (basis points, 1% = 100) for the first 24 hours after launch.
+    /// @notice The initial sell tax rate (basis points, 1% = 100) for the first 5 days after launch.
     uint16 public constant INITIAL_SELL_TAX_BPS = 800; // 8%
     
     /// @notice The normal buy tax rate (basis points, 1% = 100) after the launch period.
@@ -67,7 +67,10 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
     uint256 public constant BASIS_POINTS_DIVISOR = 10000;
     
     /// @notice The duration (in seconds) of the initial high-tax launch period.
-    uint256 public constant LAUNCH_TAX_DURATION = 24 hours;
+    /// @dev Note: This is 5 days from token deployment, but actual trading with high tax
+    ///      is shorter due to 48-hour fair launch period and liquidity deployment delay.
+    ///      Effective high tax trading period = 5 days - 2 days (fair launch) = ~3 days.
+    uint256 public constant LAUNCH_TAX_DURATION = 5 days;
     
     /// @notice The minimum amount of AEC required to trigger PerpetualEngine approval.
     uint256 public constant MIN_AEC_TO_TRIGGER_APPROVAL = 1000 * 10**18; // 1,000 AEC
@@ -382,7 +385,7 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
     // --- View Functions ---
     /**
      * @notice Gets the current buy tax rate in basis points (1% = 100 BPS).
-     * @dev Returns the higher initial tax rate during the first 24 hours, or the normal rate thereafter.
+     * @dev Returns the higher initial tax rate during the first 5 days, or the normal rate thereafter.
      * @return uint16 The current buy tax rate in BPS.
      */
     function getCurrentBuyTaxBps() public view returns (uint16) {
@@ -392,7 +395,7 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
 
     /**
      * @notice Gets the current sell tax rate in basis points (1% = 100 BPS).
-     * @dev Returns the higher initial tax rate during the first 24 hours, or the normal rate thereafter.
+     * @dev Returns the higher initial tax rate during the first 5 days, or the normal rate thereafter.
      * @return uint16 The current sell tax rate in BPS.
      */
     function getCurrentSellTaxBps() public view returns (uint16) {
@@ -411,7 +414,7 @@ contract AECToken is ERC20, ERC20Burnable, Ownable, ReentrancyGuard, IAECToken {
 
     /**
      * @notice Gets comprehensive information about the current state of the contract.
-     * @return isLaunchPeriod Whether we're still in the 24-hour launch period.
+     * @return isLaunchPeriod Whether we're still in the 5-day launch period.
      * @return currentBuyTax Current buy tax rate in BPS.
      * @return currentSellTax Current sell tax rate in BPS.
      * @return collectedTax Amount of tax currently collected and ready for processing.

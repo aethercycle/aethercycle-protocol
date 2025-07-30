@@ -84,7 +84,7 @@ describe("FairLaunch Edge Cases", function () {
     await mockUSDC.connect(user1).approve(fairLaunch.target, ethers.parseUnits("1000", USDC_DECIMALS));
     await fairLaunch.connect(user1).contribute(ethers.parseUnits("1000", USDC_DECIMALS));
     // Fast forward >24 hours (emergency period expired)
-    await ethers.provider.send("evm_increaseTime", [25 * 3600]);
+    await ethers.provider.send("evm_increaseTime", [25 * 60 * 60]); // 25 hours
     await ethers.provider.send("evm_mine");
     await expect(fairLaunch.connect(user1).emergencyWithdraw()).to.be.revertedWith("Emergency period ended");
   });
